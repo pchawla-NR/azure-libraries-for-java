@@ -14,6 +14,7 @@ import com.microsoft.azure.credentials.AzureTokenCredentials;
 import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.management.compute.AvailabilitySet;
 import com.microsoft.azure.management.compute.AvailabilitySetSkuTypes;
+import com.microsoft.azure.management.compute.BillingProfile;
 import com.microsoft.azure.management.compute.BootDiagnostics;
 import com.microsoft.azure.management.compute.CachingTypes;
 import com.microsoft.azure.management.compute.DataDisk;
@@ -34,6 +35,8 @@ import com.microsoft.azure.management.compute.OSProfile;
 import com.microsoft.azure.management.compute.OperatingSystemTypes;
 import com.microsoft.azure.management.compute.Plan;
 import com.microsoft.azure.management.compute.PowerState;
+import com.microsoft.azure.management.compute.ProximityPlacementGroup;
+import com.microsoft.azure.management.compute.ProximityPlacementGroupType;
 import com.microsoft.azure.management.compute.PurchasePlan;
 import com.microsoft.azure.management.compute.ResourceIdentityType;
 import com.microsoft.azure.management.compute.RunCommandInput;
@@ -49,7 +52,9 @@ import com.microsoft.azure.management.compute.VirtualMachineCaptureParameters;
 import com.microsoft.azure.management.compute.VirtualMachineDataDisk;
 import com.microsoft.azure.management.compute.VirtualMachineEncryption;
 import com.microsoft.azure.management.compute.VirtualMachineExtension;
+import com.microsoft.azure.management.compute.VirtualMachineEvictionPolicyTypes;
 import com.microsoft.azure.management.compute.VirtualMachineInstanceView;
+import com.microsoft.azure.management.compute.VirtualMachinePriorityTypes;
 import com.microsoft.azure.management.compute.VirtualMachineSize;
 import com.microsoft.azure.management.compute.VirtualMachineSizeTypes;
 import com.microsoft.azure.management.compute.VirtualMachineUnmanagedDataDisk;
@@ -66,6 +71,7 @@ import com.microsoft.azure.management.network.NetworkInterface;
 import com.microsoft.azure.management.network.PublicIPAddress;
 import com.microsoft.azure.management.network.implementation.NetworkManager;
 import com.microsoft.azure.management.resources.fluentcore.arm.AvailabilityZoneId;
+import com.microsoft.azure.management.resources.fluentcore.arm.ResourceId;
 import com.microsoft.azure.management.resources.fluentcore.arm.ResourceUtils;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.implementation.GroupableResourceImpl;
 import com.microsoft.azure.management.resources.fluentcore.model.Creatable;
@@ -163,6 +169,10 @@ class VirtualMachineImpl
     private VirtualMachineMsiHandler virtualMachineMsiHandler;
     // Reference to the PublicIp creatable that is implicitly created
     private  PublicIPAddress.DefinitionStages.WithCreate implicitPipCreatable;
+    // Name of the new proximity placement group
+    private String newProximityPlacementGroupName;
+    // Type fo the new proximity placement group
+    private ProximityPlacementGroupType newProximityPlacementGroupType;
 
     VirtualMachineImpl(String name,
                        VirtualMachineInner innerModel,
@@ -190,6 +200,8 @@ class VirtualMachineImpl
         initializeDataDisks();
         this.bootDiagnosticsHandler = new BootDiagnosticsHandler(this);
         this.virtualMachineMsiHandler = new VirtualMachineMsiHandler(rbacManager, this);
+        this.newProximityPlacementGroupName = null;
+        this.newProximityPlacementGroupType = null;
     }
 
     // Verbs
@@ -1202,6 +1214,32 @@ class VirtualMachineImpl
     }
 
     @Override
+    public VirtualMachineImpl withProximityPlacementGroup(String proximityPlacementGroupId) {
+        this.inner().withProximityPlacementGroup(new SubResource().withId(proximityPlacementGroupId));
+        //clear the new setting
+        newProximityPlacementGroupName = null;
+        return this;
+    }
+
+    @Override
+    public VirtualMachineImpl withNewProximityPlacementGroup(String proximityPlacementGroupName, ProximityPlacementGroupType type) {
+        this.newProximityPlacementGroupName = proximityPlacementGroupName;
+        this.newProximityPlacementGroupType = type;
+
+        this.inner().withProximityPlacementGroup(null);
+
+        return this;
+    }
+
+    @Override
+    public VirtualMachineImpl withoutProximityPlacementGroup() {
+        this.inner().withProximityPlacementGroup(null);
+
+        return this;
+    }
+
+
+    @Override
     public VirtualMachineImpl withNewAvailabilitySet(String name) {
         AvailabilitySet.DefinitionStages.WithGroup definitionWithGroup = super.myManager
                 .availabilitySets()
@@ -1326,6 +1364,31 @@ class VirtualMachineImpl
     @Override
     public VirtualMachineImpl withoutBootDiagnostics() {
         this.bootDiagnosticsHandler.withoutBootDiagnostics();
+        return this;
+    }
+
+    @Override
+    public VirtualMachineImpl withPriority(VirtualMachinePriorityTypes priority) {
+        this.inner().withPriority(priority);
+        return this;
+    }
+
+    @Override
+    public VirtualMachineImpl withLowPriority() {
+        this.withPriority(VirtualMachinePriorityTypes.LOW);
+        return this;
+    }
+
+    @Override
+    public VirtualMachineImpl withLowPriority(VirtualMachineEvictionPolicyTypes policy) {
+        this.withLowPriority();
+        this.inner().withEvictionPolicy(policy);
+        return this;
+    }
+
+    @Override
+    public VirtualMachineImpl withMaxPrice(Double maxPrice) {
+        this.inner().withBillingProfile(new BillingProfile().withMaxPrice(maxPrice));
         return this;
     }
 
@@ -1578,6 +1641,17 @@ class VirtualMachineImpl
     }
 
     @Override
+    public ProximityPlacementGroup proximityPlacementGroup() {
+        ResourceId id = ResourceId.fromString(inner().proximityPlacementGroup().id());
+        ProximityPlacementGroupInner plgInner = manager().inner().proximityPlacementGroups().getByResourceGroup(id.resourceGroupName(), id.name());
+       if (plgInner == null) {
+           return null;
+       } else {
+           return new ProximityPlacementGroupImpl(plgInner);
+       }
+    }
+
+    @Override
     public Observable<VirtualMachineExtension> listExtensionsAsync() {
         return this.virtualMachineExtensions.listAsync();
     }
@@ -1685,6 +1759,21 @@ class VirtualMachineImpl
         return Collections.unmodifiableSet(new HashSet<String>());
     }
 
+    @Override
+    public BillingProfile billingProfile() {
+        return this.inner().billingProfile();
+    }
+
+    @Override
+    public VirtualMachinePriorityTypes priority() {
+        return  this.inner().priority();
+    }
+
+    @Override
+    public VirtualMachineEvictionPolicyTypes evictionPolicy() {
+        return  this.inner().evictionPolicy();
+    }
+
     // CreateUpdateTaskGroup.ResourceCreator.beforeGroupCreateOrUpdate implementation
     //
     @Override
@@ -1732,6 +1821,7 @@ class VirtualMachineImpl
         this.handleUnManagedOSAndDataDisksStorageSettings();
         this.bootDiagnosticsHandler.handleDiagnosticsSettings();
         this.handleNetworkSettings();
+        this.createNewProximityPlacementGroup();
         this.handleAvailabilitySettings();
         this.virtualMachineMsiHandler.processCreatedExternalIdentities();
         this.virtualMachineMsiHandler.handleExternalIdentities();
@@ -1769,10 +1859,13 @@ class VirtualMachineImpl
         updateParameter.withOsProfile(this.inner().osProfile());
         updateParameter.withNetworkProfile(this.inner().networkProfile());
         updateParameter.withDiagnosticsProfile(this.inner().diagnosticsProfile());
+        updateParameter.withBillingProfile(this.inner().billingProfile());
         updateParameter.withAvailabilitySet(this.inner().availabilitySet());
         updateParameter.withLicenseType(this.inner().licenseType());
         updateParameter.withZones(this.inner().zones());
         updateParameter.withTags(this.inner().getTags());
+        updateParameter.withProximityPlacementGroup(this.inner().proximityPlacementGroup());
+        updateParameter.withPriority(this.inner().priority());
         //
         this.virtualMachineMsiHandler.handleExternalIdentities(updateParameter);
         //
@@ -2018,6 +2111,20 @@ class VirtualMachineImpl
                 UnmanagedDataDiskImpl.ensureDisksVhdUri(unmanagedDataDisks, storageAccount, vmName);
             } else {
                 UnmanagedDataDiskImpl.ensureDisksVhdUri(unmanagedDataDisks, vmName);
+            }
+        }
+    }
+
+    private void createNewProximityPlacementGroup() {
+        if (isInCreateMode()) {
+            if (this.newProximityPlacementGroupName != null && !this.newProximityPlacementGroupName.isEmpty()) {
+                ProximityPlacementGroupInner plgInner = new ProximityPlacementGroupInner();
+                plgInner.withProximityPlacementGroupType(this.newProximityPlacementGroupType);
+                plgInner.withLocation(this.inner().location());
+                plgInner = this.manager().inner().proximityPlacementGroups().createOrUpdate(this.resourceGroupName(),
+                        this.newProximityPlacementGroupName, plgInner);
+
+                this.inner().withProximityPlacementGroup((new SubResource().withId(plgInner.id())));
             }
         }
     }

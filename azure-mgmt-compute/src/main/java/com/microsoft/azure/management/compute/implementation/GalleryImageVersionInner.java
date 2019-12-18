@@ -8,12 +8,12 @@
 
 package com.microsoft.azure.management.compute.implementation;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.microsoft.azure.Resource;
 import com.microsoft.azure.management.compute.GalleryImageVersionPublishingProfile;
 import com.microsoft.azure.management.compute.GalleryImageVersionStorageProfile;
 import com.microsoft.azure.management.compute.ReplicationStatus;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microsoft.rest.serializer.JsonFlatten;
+import com.microsoft.azure.Resource;
 
 /**
  * Specifies information about the gallery Image Version that you want to
@@ -24,7 +24,7 @@ public class GalleryImageVersionInner extends Resource {
     /**
      * The publishingProfile property.
      */
-    @JsonProperty(value = "properties.publishingProfile", required = true)
+    @JsonProperty(value = "properties.publishingProfile")
     private GalleryImageVersionPublishingProfile publishingProfile;
 
     /**
@@ -39,7 +39,7 @@ public class GalleryImageVersionInner extends Resource {
     /**
      * The storageProfile property.
      */
-    @JsonProperty(value = "properties.storageProfile", access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty(value = "properties.storageProfile", required = true)
     private GalleryImageVersionStorageProfile storageProfile;
 
     /**
@@ -84,6 +84,17 @@ public class GalleryImageVersionInner extends Resource {
      */
     public GalleryImageVersionStorageProfile storageProfile() {
         return this.storageProfile;
+    }
+
+    /**
+     * Set the storageProfile value.
+     *
+     * @param storageProfile the storageProfile value to set
+     * @return the GalleryImageVersionInner object itself.
+     */
+    public GalleryImageVersionInner withStorageProfile(GalleryImageVersionStorageProfile storageProfile) {
+        this.storageProfile = storageProfile;
+        return this;
     }
 
     /**

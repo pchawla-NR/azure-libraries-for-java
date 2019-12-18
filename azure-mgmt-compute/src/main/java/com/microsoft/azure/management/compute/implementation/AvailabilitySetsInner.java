@@ -8,38 +8,37 @@
 
 package com.microsoft.azure.management.compute.implementation;
 
+import com.microsoft.azure.management.resources.fluentcore.collection.InnerSupportsGet;
+import com.microsoft.azure.management.resources.fluentcore.collection.InnerSupportsDelete;
+import com.microsoft.azure.management.resources.fluentcore.collection.InnerSupportsListing;
+import retrofit2.Retrofit;
 import com.google.common.reflect.TypeToken;
 import com.microsoft.azure.AzureServiceFuture;
 import com.microsoft.azure.CloudException;
 import com.microsoft.azure.ListOperationCallback;
+import com.microsoft.azure.management.compute.AvailabilitySetUpdate;
 import com.microsoft.azure.Page;
 import com.microsoft.azure.PagedList;
-import com.microsoft.azure.management.compute.AvailabilitySetUpdate;
-import com.microsoft.azure.management.resources.fluentcore.collection.InnerSupportsDelete;
-import com.microsoft.azure.management.resources.fluentcore.collection.InnerSupportsGet;
-import com.microsoft.azure.management.resources.fluentcore.collection.InnerSupportsListing;
 import com.microsoft.rest.ServiceCallback;
 import com.microsoft.rest.ServiceFuture;
 import com.microsoft.rest.ServiceResponse;
 import com.microsoft.rest.Validator;
-import okhttp3.ResponseBody;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.http.Body;
-import retrofit2.http.GET;
-import retrofit2.http.HTTP;
-import retrofit2.http.Header;
-import retrofit2.http.Headers;
-import retrofit2.http.PATCH;
-import retrofit2.http.PUT;
-import retrofit2.http.Path;
-import retrofit2.http.Query;
-import retrofit2.http.Url;
-import rx.Observable;
-import rx.functions.Func1;
-
 import java.io.IOException;
 import java.util.List;
+import okhttp3.ResponseBody;
+import retrofit2.http.Body;
+import retrofit2.http.GET;
+import retrofit2.http.Header;
+import retrofit2.http.Headers;
+import retrofit2.http.HTTP;
+import retrofit2.http.PATCH;
+import retrofit2.http.Path;
+import retrofit2.http.PUT;
+import retrofit2.http.Query;
+import retrofit2.http.Url;
+import retrofit2.Response;
+import rx.functions.Func1;
+import rx.Observable;
 
 /**
  * An instance of this class provides access to all the operations defined
@@ -85,7 +84,7 @@ public class AvailabilitySetsInner implements InnerSupportsGet<AvailabilitySetIn
 
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.azure.management.compute.AvailabilitySets list" })
         @GET("subscriptions/{subscriptionId}/providers/Microsoft.Compute/availabilitySets")
-        Observable<Response<ResponseBody>> list(@Path("subscriptionId") String subscriptionId, @Query("api-version") String apiVersion, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
+        Observable<Response<ResponseBody>> list(@Path("subscriptionId") String subscriptionId, @Query("api-version") String apiVersion, @Query("$expand") String expand, @Header("accept-language") String acceptLanguage, @Header("User-Agent") String userAgent);
 
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.azure.management.compute.AvailabilitySets listByResourceGroup" })
         @GET("subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/availabilitySets")
@@ -175,7 +174,7 @@ public class AvailabilitySetsInner implements InnerSupportsGet<AvailabilitySetIn
             throw new IllegalArgumentException("Parameter parameters is required and cannot be null.");
         }
         Validator.validate(parameters);
-        final String apiVersion = "2018-10-01";
+        final String apiVersion = "2019-03-01";
         return service.createOrUpdate(resourceGroupName, availabilitySetName, this.client.subscriptionId(), parameters, apiVersion, this.client.acceptLanguage(), this.client.userAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<AvailabilitySetInner>>>() {
                 @Override
@@ -267,7 +266,7 @@ public class AvailabilitySetsInner implements InnerSupportsGet<AvailabilitySetIn
             throw new IllegalArgumentException("Parameter parameters is required and cannot be null.");
         }
         Validator.validate(parameters);
-        final String apiVersion = "2018-10-01";
+        final String apiVersion = "2019-03-01";
         return service.update(resourceGroupName, availabilitySetName, this.client.subscriptionId(), parameters, apiVersion, this.client.acceptLanguage(), this.client.userAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<AvailabilitySetInner>>>() {
                 @Override
@@ -350,7 +349,7 @@ public class AvailabilitySetsInner implements InnerSupportsGet<AvailabilitySetIn
         if (this.client.subscriptionId() == null) {
             throw new IllegalArgumentException("Parameter this.client.subscriptionId() is required and cannot be null.");
         }
-        final String apiVersion = "2018-10-01";
+        final String apiVersion = "2019-03-01";
         return service.delete(resourceGroupName, availabilitySetName, this.client.subscriptionId(), apiVersion, this.client.acceptLanguage(), this.client.userAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<Void>>>() {
                 @Override
@@ -435,7 +434,7 @@ public class AvailabilitySetsInner implements InnerSupportsGet<AvailabilitySetIn
         if (this.client.subscriptionId() == null) {
             throw new IllegalArgumentException("Parameter this.client.subscriptionId() is required and cannot be null.");
         }
-        final String apiVersion = "2018-10-01";
+        final String apiVersion = "2019-03-01";
         return service.getByResourceGroup(resourceGroupName, availabilitySetName, this.client.subscriptionId(), apiVersion, this.client.acceptLanguage(), this.client.userAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<AvailabilitySetInner>>>() {
                 @Override
@@ -540,8 +539,112 @@ public class AvailabilitySetsInner implements InnerSupportsGet<AvailabilitySetIn
         if (this.client.subscriptionId() == null) {
             throw new IllegalArgumentException("Parameter this.client.subscriptionId() is required and cannot be null.");
         }
-        final String apiVersion = "2018-10-01";
-        return service.list(this.client.subscriptionId(), apiVersion, this.client.acceptLanguage(), this.client.userAgent())
+        final String apiVersion = "2019-03-01";
+        final String expand = null;
+        return service.list(this.client.subscriptionId(), apiVersion, expand, this.client.acceptLanguage(), this.client.userAgent())
+            .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<Page<AvailabilitySetInner>>>>() {
+                @Override
+                public Observable<ServiceResponse<Page<AvailabilitySetInner>>> call(Response<ResponseBody> response) {
+                    try {
+                        ServiceResponse<PageImpl1<AvailabilitySetInner>> result = listDelegate(response);
+                        return Observable.just(new ServiceResponse<Page<AvailabilitySetInner>>(result.body(), result.response()));
+                    } catch (Throwable t) {
+                        return Observable.error(t);
+                    }
+                }
+            });
+    }
+
+    /**
+     * Lists all availability sets in a subscription.
+     *
+     * @param expand The expand expression to apply to the operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @throws CloudException thrown if the request is rejected by server
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent
+     * @return the PagedList&lt;AvailabilitySetInner&gt; object if successful.
+     */
+    public PagedList<AvailabilitySetInner> list(final String expand) {
+        ServiceResponse<Page<AvailabilitySetInner>> response = listSinglePageAsync(expand).toBlocking().single();
+        return new PagedList<AvailabilitySetInner>(response.body()) {
+            @Override
+            public Page<AvailabilitySetInner> nextPage(String nextPageLink) {
+                return listNextSinglePageAsync(nextPageLink).toBlocking().single().body();
+            }
+        };
+    }
+
+    /**
+     * Lists all availability sets in a subscription.
+     *
+     * @param expand The expand expression to apply to the operation.
+     * @param serviceCallback the async ServiceCallback to handle successful and failed responses.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the {@link ServiceFuture} object
+     */
+    public ServiceFuture<List<AvailabilitySetInner>> listAsync(final String expand, final ListOperationCallback<AvailabilitySetInner> serviceCallback) {
+        return AzureServiceFuture.fromPageResponse(
+            listSinglePageAsync(expand),
+            new Func1<String, Observable<ServiceResponse<Page<AvailabilitySetInner>>>>() {
+                @Override
+                public Observable<ServiceResponse<Page<AvailabilitySetInner>>> call(String nextPageLink) {
+                    return listNextSinglePageAsync(nextPageLink);
+                }
+            },
+            serviceCallback);
+    }
+
+    /**
+     * Lists all availability sets in a subscription.
+     *
+     * @param expand The expand expression to apply to the operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the PagedList&lt;AvailabilitySetInner&gt; object
+     */
+    public Observable<Page<AvailabilitySetInner>> listAsync(final String expand) {
+        return listWithServiceResponseAsync(expand)
+            .map(new Func1<ServiceResponse<Page<AvailabilitySetInner>>, Page<AvailabilitySetInner>>() {
+                @Override
+                public Page<AvailabilitySetInner> call(ServiceResponse<Page<AvailabilitySetInner>> response) {
+                    return response.body();
+                }
+            });
+    }
+
+    /**
+     * Lists all availability sets in a subscription.
+     *
+     * @param expand The expand expression to apply to the operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the observable to the PagedList&lt;AvailabilitySetInner&gt; object
+     */
+    public Observable<ServiceResponse<Page<AvailabilitySetInner>>> listWithServiceResponseAsync(final String expand) {
+        return listSinglePageAsync(expand)
+            .concatMap(new Func1<ServiceResponse<Page<AvailabilitySetInner>>, Observable<ServiceResponse<Page<AvailabilitySetInner>>>>() {
+                @Override
+                public Observable<ServiceResponse<Page<AvailabilitySetInner>>> call(ServiceResponse<Page<AvailabilitySetInner>> page) {
+                    String nextPageLink = page.body().nextPageLink();
+                    if (nextPageLink == null) {
+                        return Observable.just(page);
+                    }
+                    return Observable.just(page).concatWith(listNextWithServiceResponseAsync(nextPageLink));
+                }
+            });
+    }
+
+    /**
+     * Lists all availability sets in a subscription.
+     *
+    ServiceResponse<PageImpl1<AvailabilitySetInner>> * @param expand The expand expression to apply to the operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation
+     * @return the PagedList&lt;AvailabilitySetInner&gt; object wrapped in {@link ServiceResponse} if successful.
+     */
+    public Observable<ServiceResponse<Page<AvailabilitySetInner>>> listSinglePageAsync(final String expand) {
+        if (this.client.subscriptionId() == null) {
+            throw new IllegalArgumentException("Parameter this.client.subscriptionId() is required and cannot be null.");
+        }
+        final String apiVersion = "2019-03-01";
+        return service.list(this.client.subscriptionId(), apiVersion, expand, this.client.acceptLanguage(), this.client.userAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<Page<AvailabilitySetInner>>>>() {
                 @Override
                 public Observable<ServiceResponse<Page<AvailabilitySetInner>>> call(Response<ResponseBody> response) {
@@ -653,7 +756,7 @@ public class AvailabilitySetsInner implements InnerSupportsGet<AvailabilitySetIn
         if (this.client.subscriptionId() == null) {
             throw new IllegalArgumentException("Parameter this.client.subscriptionId() is required and cannot be null.");
         }
-        final String apiVersion = "2018-10-01";
+        final String apiVersion = "2019-03-01";
         return service.listByResourceGroup(resourceGroupName, this.client.subscriptionId(), apiVersion, this.client.acceptLanguage(), this.client.userAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<Page<AvailabilitySetInner>>>>() {
                 @Override
@@ -737,7 +840,7 @@ public class AvailabilitySetsInner implements InnerSupportsGet<AvailabilitySetIn
         if (this.client.subscriptionId() == null) {
             throw new IllegalArgumentException("Parameter this.client.subscriptionId() is required and cannot be null.");
         }
-        final String apiVersion = "2018-10-01";
+        final String apiVersion = "2019-03-01";
         return service.listAvailableSizes(resourceGroupName, availabilitySetName, this.client.subscriptionId(), apiVersion, this.client.acceptLanguage(), this.client.userAgent())
             .flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<List<VirtualMachineSizeInner>>>>() {
                 @Override

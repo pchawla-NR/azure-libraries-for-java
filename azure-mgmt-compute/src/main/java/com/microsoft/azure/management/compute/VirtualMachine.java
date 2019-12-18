@@ -390,6 +390,13 @@ public interface VirtualMachine extends
     String licenseType();
 
     /**
+     * Get specifies information about the proximity placement group that the virtual machine scale set should be
+     * assigned to.
+     * @return the proximityPlacementGroup.
+     */
+    ProximityPlacementGroup proximityPlacementGroup();
+
+    /**
      * @return a representation of the deferred computation of this call, returning extensions attached to the virtual machine
      */
     Observable<VirtualMachineExtension> listExtensionsAsync();
@@ -483,6 +490,25 @@ public interface VirtualMachine extends
      */
     Set<String> userAssignedManagedServiceIdentityIds();
 
+    /**
+     * @return the priority for the virtual machine.
+     */
+    @Beta(Beta.SinceVersion.V1_25_0)
+    VirtualMachinePriorityTypes priority();
+
+
+    /**
+     * @return the eviction policy for the virtual machine.
+     */
+    @Beta(Beta.SinceVersion.V1_25_0)
+    VirtualMachineEvictionPolicyTypes evictionPolicy();
+
+    /**
+     * @return the billing related details of a low priority virtual machine
+     */
+    @Beta(Beta.SinceVersion.V1_25_0)
+    BillingProfile billingProfile();
+
     // Setters
     //
 
@@ -499,6 +525,7 @@ public interface VirtualMachine extends
             DefinitionStages.WithPublicIPAddress,
             DefinitionStages.WithPrimaryNetworkInterface,
             DefinitionStages.WithOS,
+            DefinitionStages.WithProximityPlacementGroup,
             DefinitionStages.WithCreate {
     }
 
@@ -650,7 +677,7 @@ public interface VirtualMachine extends
              * @param creatable a creatable definition for a new public IP
              * @return the next stage of the definition
              */
-            WithOS withNewPrimaryPublicIPAddress(Creatable<PublicIPAddress> creatable);
+            WithProximityPlacementGroup withNewPrimaryPublicIPAddress(Creatable<PublicIPAddress> creatable);
 
             /**
              * Creates a new public IP address in the same region and resource group as the resource, with the specified DNS label
@@ -661,7 +688,7 @@ public interface VirtualMachine extends
              * @param leafDnsLabel a leaf domain label
              * @return the next stage of the definition
              */
-            WithOS withNewPrimaryPublicIPAddress(String leafDnsLabel);
+            WithProximityPlacementGroup withNewPrimaryPublicIPAddress(String leafDnsLabel);
 
             /**
              * Associates an existing public IP address with the VM's primary network interface.
@@ -669,14 +696,14 @@ public interface VirtualMachine extends
              * @param publicIPAddress an existing public IP address
              * @return the next stage of the definition
              */
-            WithOS withExistingPrimaryPublicIPAddress(PublicIPAddress publicIPAddress);
+            WithProximityPlacementGroup withExistingPrimaryPublicIPAddress(PublicIPAddress publicIPAddress);
 
             /**
              * Specifies that the VM should not have a public IP address.
              *
              * @return the next stage of the definition
              */
-            WithOS withoutPrimaryPublicIPAddress();
+            WithProximityPlacementGroup withoutPrimaryPublicIPAddress();
         }
 
         /**
@@ -690,7 +717,7 @@ public interface VirtualMachine extends
              * @param creatable a creatable definition for a new network interface
              * @return the next stage of the definition
              */
-            WithOS withNewPrimaryNetworkInterface(Creatable<NetworkInterface> creatable);
+            WithProximityPlacementGroup withNewPrimaryNetworkInterface(Creatable<NetworkInterface> creatable);
 
             /**
              * Associates an existing network interface with the virtual machine as its primary network interface.
@@ -698,7 +725,31 @@ public interface VirtualMachine extends
              * @param networkInterface an existing network interface
              * @return the next stage of the definition
              */
-            WithOS withExistingPrimaryNetworkInterface(NetworkInterface networkInterface);
+            WithProximityPlacementGroup withExistingPrimaryNetworkInterface(NetworkInterface networkInterface);
+        }
+
+        /**
+         * The stage of a virtual machine definition allowing to
+         * set information about the proximity placement group that the virtual machine scale set should
+         * be assigned to.
+         */
+        interface WithProximityPlacementGroup extends WithOS {
+            /**
+             * Set information about the proximity placement group that the virtual machine scale set should
+             * be assigned to.
+             * @param promixityPlacementGroupId  The Id of the proximity placement group subResource.
+             *
+             * @return the next stage of the definition.
+             */
+            WithOS withProximityPlacementGroup(String promixityPlacementGroupId);
+
+            /**
+             * Creates a new proximity placement gruup witht he specified name and then adds it to the VM.
+             * @param proximityPlacementGroupName The name of the group to be created.
+             * @param type the type of the group
+             * @return the next stage of the definition.
+             */
+            WithOS withNewProximityPlacementGroup(String proximityPlacementGroupName, ProximityPlacementGroupType type);
         }
 
         /**
@@ -1584,6 +1635,53 @@ public interface VirtualMachine extends
         }
 
         /**
+         * The stage of the virtual machine definition allowing to specify priority.
+         */
+        @Beta(Beta.SinceVersion.V1_25_0)
+        interface WithPriority {
+            /**
+             * Specifies the priority of the virtual machine.
+             *
+             * @param priority the priority to set
+             * @return the next stage of the definition
+             */
+            @Beta(Beta.SinceVersion.V1_25_0)
+            WithCreate withPriority(VirtualMachinePriorityTypes priority);
+
+            /**
+             * Specify that virtual machine should be low priority.
+             *
+             * @return the next stage of the definition
+             */
+            @Beta(Beta.SinceVersion.V1_25_0)
+            WithCreate withLowPriority();
+
+            /**
+             * Specify that virtual machines should be low priority VMs with the provided eviction policy.
+             *
+             * @param policy eviction policy for the virtual machine
+             * @return the next stage of the definition
+             */
+            @Beta(Beta.SinceVersion.V1_25_0)
+            WithCreate withLowPriority(VirtualMachineEvictionPolicyTypes policy);
+        }
+
+        /**
+         * The stage of a virtual machine definition allowing to set the billing related details of a low priority virtual machine.
+         */
+        @Beta(Beta.SinceVersion.V1_25_0)
+        interface WithBillingProfile {
+
+            /**
+             * Set the billing related details of a low priority virtual machine. This price is in US Dollars.
+             * @param maxPrice the maxPrice value to set
+             * @return the next stage of the definition
+             */
+            @Beta(Beta.SinceVersion.V1_25_0)
+            WithCreate withMaxPrice(Double maxPrice);
+        }
+
+        /**
          * The stage of the virtual machine definition allowing to enable System Assigned (Local) Managed Service Identity.
          */
         @Beta(Beta.SinceVersion.V1_5_0)
@@ -1773,6 +1871,8 @@ public interface VirtualMachine extends
                 DefinitionStages.WithExtension,
                 DefinitionStages.WithPlan,
                 DefinitionStages.WithBootDiagnostics,
+                DefinitionStages.WithPriority,
+                DefinitionStages.WithBillingProfile,
                 DefinitionStages.WithSystemAssignedManagedServiceIdentity,
                 DefinitionStages.WithUserAssignedManagedServiceIdentity,
                 DefinitionStages.WithLicenseType {
@@ -1783,6 +1883,43 @@ public interface VirtualMachine extends
      * Grouping of virtual machine update stages.
      */
     interface UpdateStages {
+        /**
+         * The stage of a virtual machine update allowing to
+         * set/remove information about the proximity placement group that the virtual machine scale set should
+         * be assigned to.
+         */
+        interface WithProximityPlacementGroup {
+            /**
+             * Set information about the proximity placement group that the virtual machineshould
+             * be assigned to.
+             * @param proximityPlacementGroupId  The Id of the proximity placement group subResource.
+             *
+             * @return the next stage of the definition.
+             */
+            Update withProximityPlacementGroup(String proximityPlacementGroupId);
+
+            /**
+             * Removes the Proximity placement group from the VM.
+             * @return the next stage of the definition.
+             */
+            Update withoutProximityPlacementGroup();
+        }
+
+        /**
+
+        /**
+         * The stage of the virtual machine update allowing to specify billing profile.
+         */
+        @Beta(Beta.SinceVersion.V1_25_0)
+        interface WithBillingProfile {
+            /**
+             * Set the billing related details of a low priority virtual machine.
+             * @param maxPrice the maxPrice value to set
+             * @return the next stage of the update
+             */
+            Update withMaxPrice(Double maxPrice);
+        }
+
         /**
          * The stage of a virtual machine definition allowing to specify unmanaged data disk configuration.
          */
@@ -2214,11 +2351,13 @@ public interface VirtualMachine extends
     interface Update extends
             Appliable<VirtualMachine>,
             Resource.UpdateWithTags<Update>,
+            UpdateStages.WithProximityPlacementGroup,
             UpdateStages.WithUnmanagedDataDisk,
             UpdateStages.WithManagedDataDisk,
             UpdateStages.WithSecondaryNetworkInterface,
             UpdateStages.WithExtension,
             UpdateStages.WithBootDiagnostics,
+            UpdateStages.WithBillingProfile,
             UpdateStages.WithSystemAssignedManagedServiceIdentity,
             UpdateStages.WithUserAssignedManagedServiceIdentity,
             UpdateStages.WithLicenseType {
@@ -2291,5 +2430,14 @@ public interface VirtualMachine extends
          * @return the next stage of the definition
          */
         Update withSize(VirtualMachineSizeTypes size);
+
+        /**
+         * Specifies a new priority for the virtual machine.
+         *
+         * @param priority a priority from the list of available priority types
+         * @return the next stage of the update
+         */
+        @Beta(Beta.SinceVersion.V1_29_0)
+        Update withPriority(VirtualMachinePriorityTypes priority);
     }
 }
