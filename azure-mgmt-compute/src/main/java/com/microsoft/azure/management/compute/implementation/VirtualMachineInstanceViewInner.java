@@ -8,15 +8,15 @@
 
 package com.microsoft.azure.management.compute.implementation;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.microsoft.azure.management.compute.BootDiagnosticsInstanceView;
-import com.microsoft.azure.management.compute.DiskInstanceView;
-import com.microsoft.azure.management.compute.InstanceViewStatus;
-import com.microsoft.azure.management.compute.MaintenanceRedeployStatus;
+import com.microsoft.azure.management.compute.HyperVGenerationType;
 import com.microsoft.azure.management.compute.VirtualMachineAgentInstanceView;
-import com.microsoft.azure.management.compute.VirtualMachineExtensionInstanceView;
-
+import com.microsoft.azure.management.compute.MaintenanceRedeployStatus;
 import java.util.List;
+import com.microsoft.azure.management.compute.DiskInstanceView;
+import com.microsoft.azure.management.compute.VirtualMachineExtensionInstanceView;
+import com.microsoft.azure.management.compute.BootDiagnosticsInstanceView;
+import com.microsoft.azure.management.compute.InstanceViewStatus;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * The instance view of a virtual machine.
@@ -51,6 +51,13 @@ public class VirtualMachineInstanceViewInner {
      */
     @JsonProperty(value = "osVersion")
     private String osVersion;
+
+    /**
+     * Specifies the HyperVGeneration Type associated with a resource. Possible
+     * values include: 'V1', 'V2'.
+     */
+    @JsonProperty(value = "hyperVGeneration")
+    private HyperVGenerationType hyperVGeneration;
 
     /**
      * The Remote desktop certificate thumbprint.
@@ -195,6 +202,26 @@ public class VirtualMachineInstanceViewInner {
      */
     public VirtualMachineInstanceViewInner withOsVersion(String osVersion) {
         this.osVersion = osVersion;
+        return this;
+    }
+
+    /**
+     * Get specifies the HyperVGeneration Type associated with a resource. Possible values include: 'V1', 'V2'.
+     *
+     * @return the hyperVGeneration value
+     */
+    public HyperVGenerationType hyperVGeneration() {
+        return this.hyperVGeneration;
+    }
+
+    /**
+     * Set specifies the HyperVGeneration Type associated with a resource. Possible values include: 'V1', 'V2'.
+     *
+     * @param hyperVGeneration the hyperVGeneration value to set
+     * @return the VirtualMachineInstanceViewInner object itself.
+     */
+    public VirtualMachineInstanceViewInner withHyperVGeneration(HyperVGenerationType hyperVGeneration) {
+        this.hyperVGeneration = hyperVGeneration;
         return this;
     }
 

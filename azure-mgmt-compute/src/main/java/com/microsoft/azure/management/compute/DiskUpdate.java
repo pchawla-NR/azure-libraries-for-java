@@ -8,10 +8,9 @@
 
 package com.microsoft.azure.management.compute;
 
+import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microsoft.rest.serializer.JsonFlatten;
-
-import java.util.Map;
 
 /**
  * Disk update resource.
@@ -26,7 +25,7 @@ public class DiskUpdate {
 
     /**
      * If creationData.createOption is Empty, this field is mandatory and it
-     * indicates the size of the VHD to create. If this field is present for
+     * indicates the size of the disk to create. If this field is present for
      * updates or creation with other options, it indicates a resize. Resizes
      * are only allowed if the disk is not attached to a running VM, and can
      * only increase the disk's size.
@@ -35,10 +34,11 @@ public class DiskUpdate {
     private Integer diskSizeGB;
 
     /**
-     * Encryption settings for disk or snapshot.
+     * Encryption settings collection used be Azure Disk Encryption, can
+     * contain multiple encryption settings per disk or snapshot.
      */
-    @JsonProperty(value = "properties.encryptionSettings")
-    private EncryptionSettings encryptionSettings;
+    @JsonProperty(value = "properties.encryptionSettingsCollection")
+    private EncryptionSettingsCollection encryptionSettingsCollection;
 
     /**
      * The number of IOPS allowed for this disk; only settable for UltraSSD
@@ -88,7 +88,7 @@ public class DiskUpdate {
     }
 
     /**
-     * Get if creationData.createOption is Empty, this field is mandatory and it indicates the size of the VHD to create. If this field is present for updates or creation with other options, it indicates a resize. Resizes are only allowed if the disk is not attached to a running VM, and can only increase the disk's size.
+     * Get if creationData.createOption is Empty, this field is mandatory and it indicates the size of the disk to create. If this field is present for updates or creation with other options, it indicates a resize. Resizes are only allowed if the disk is not attached to a running VM, and can only increase the disk's size.
      *
      * @return the diskSizeGB value
      */
@@ -97,7 +97,7 @@ public class DiskUpdate {
     }
 
     /**
-     * Set if creationData.createOption is Empty, this field is mandatory and it indicates the size of the VHD to create. If this field is present for updates or creation with other options, it indicates a resize. Resizes are only allowed if the disk is not attached to a running VM, and can only increase the disk's size.
+     * Set if creationData.createOption is Empty, this field is mandatory and it indicates the size of the disk to create. If this field is present for updates or creation with other options, it indicates a resize. Resizes are only allowed if the disk is not attached to a running VM, and can only increase the disk's size.
      *
      * @param diskSizeGB the diskSizeGB value to set
      * @return the DiskUpdate object itself.
@@ -108,22 +108,22 @@ public class DiskUpdate {
     }
 
     /**
-     * Get encryption settings for disk or snapshot.
+     * Get encryption settings collection used be Azure Disk Encryption, can contain multiple encryption settings per disk or snapshot.
      *
-     * @return the encryptionSettings value
+     * @return the encryptionSettingsCollection value
      */
-    public EncryptionSettings encryptionSettings() {
-        return this.encryptionSettings;
+    public EncryptionSettingsCollection encryptionSettingsCollection() {
+        return this.encryptionSettingsCollection;
     }
 
     /**
-     * Set encryption settings for disk or snapshot.
+     * Set encryption settings collection used be Azure Disk Encryption, can contain multiple encryption settings per disk or snapshot.
      *
-     * @param encryptionSettings the encryptionSettings value to set
+     * @param encryptionSettingsCollection the encryptionSettingsCollection value to set
      * @return the DiskUpdate object itself.
      */
-    public DiskUpdate withEncryptionSettings(EncryptionSettings encryptionSettings) {
-        this.encryptionSettings = encryptionSettings;
+    public DiskUpdate withEncryptionSettingsCollection(EncryptionSettingsCollection encryptionSettingsCollection) {
+        this.encryptionSettingsCollection = encryptionSettingsCollection;
         return this;
     }
 

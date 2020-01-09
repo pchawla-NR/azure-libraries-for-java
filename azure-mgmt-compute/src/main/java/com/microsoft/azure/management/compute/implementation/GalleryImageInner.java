@@ -8,16 +8,17 @@
 
 package com.microsoft.azure.management.compute.implementation;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.microsoft.azure.Resource;
-import com.microsoft.azure.management.compute.Disallowed;
-import com.microsoft.azure.management.compute.GalleryImageIdentifier;
-import com.microsoft.azure.management.compute.ImagePurchasePlan;
-import com.microsoft.azure.management.compute.OperatingSystemStateTypes;
 import com.microsoft.azure.management.compute.OperatingSystemTypes;
-import com.microsoft.azure.management.compute.RecommendedMachineConfiguration;
-import com.microsoft.rest.serializer.JsonFlatten;
+import com.microsoft.azure.management.compute.OperatingSystemStateTypes;
+import com.microsoft.azure.management.compute.HyperVGeneration;
 import org.joda.time.DateTime;
+import com.microsoft.azure.management.compute.GalleryImageIdentifier;
+import com.microsoft.azure.management.compute.RecommendedMachineConfiguration;
+import com.microsoft.azure.management.compute.Disallowed;
+import com.microsoft.azure.management.compute.ImagePurchasePlan;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.microsoft.rest.serializer.JsonFlatten;
+import com.microsoft.azure.Resource;
 
 /**
  * Specifies information about the gallery Image Definition that you want to
@@ -61,11 +62,19 @@ public class GalleryImageInner extends Resource {
     private OperatingSystemTypes osType;
 
     /**
-     * The allowed values for OS State are 'Generalized'. Possible values
-     * include: 'Generalized', 'Specialized'.
+     * This property allows the user to specify whether the virtual machines
+     * created under this image are 'Generalized' or 'Specialized'. Possible
+     * values include: 'Generalized', 'Specialized'.
      */
     @JsonProperty(value = "properties.osState", required = true)
     private OperatingSystemStateTypes osState;
+
+    /**
+     * The hypervisor generation of the Virtual Machine. Applicable to OS disks
+     * only. Possible values include: 'V1', 'V2'.
+     */
+    @JsonProperty(value = "properties.hyperVGeneration")
+    private HyperVGeneration hyperVGeneration;
 
     /**
      * The end of life date of the gallery Image Definition. This property can
@@ -208,7 +217,7 @@ public class GalleryImageInner extends Resource {
     }
 
     /**
-     * Get the allowed values for OS State are 'Generalized'. Possible values include: 'Generalized', 'Specialized'.
+     * Get this property allows the user to specify whether the virtual machines created under this image are 'Generalized' or 'Specialized'. Possible values include: 'Generalized', 'Specialized'.
      *
      * @return the osState value
      */
@@ -217,13 +226,33 @@ public class GalleryImageInner extends Resource {
     }
 
     /**
-     * Set the allowed values for OS State are 'Generalized'. Possible values include: 'Generalized', 'Specialized'.
+     * Set this property allows the user to specify whether the virtual machines created under this image are 'Generalized' or 'Specialized'. Possible values include: 'Generalized', 'Specialized'.
      *
      * @param osState the osState value to set
      * @return the GalleryImageInner object itself.
      */
     public GalleryImageInner withOsState(OperatingSystemStateTypes osState) {
         this.osState = osState;
+        return this;
+    }
+
+    /**
+     * Get the hypervisor generation of the Virtual Machine. Applicable to OS disks only. Possible values include: 'V1', 'V2'.
+     *
+     * @return the hyperVGeneration value
+     */
+    public HyperVGeneration hyperVGeneration() {
+        return this.hyperVGeneration;
+    }
+
+    /**
+     * Set the hypervisor generation of the Virtual Machine. Applicable to OS disks only. Possible values include: 'V1', 'V2'.
+     *
+     * @param hyperVGeneration the hyperVGeneration value to set
+     * @return the GalleryImageInner object itself.
+     */
+    public GalleryImageInner withHyperVGeneration(HyperVGeneration hyperVGeneration) {
+        this.hyperVGeneration = hyperVGeneration;
         return this;
     }
 

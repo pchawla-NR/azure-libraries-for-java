@@ -8,10 +8,9 @@
 
 package com.microsoft.azure.management.compute;
 
+import java.util.Collection;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.microsoft.rest.ExpandableStringEnum;
-
-import java.util.Collection;
 
 /**
  * Defines values for VirtualMachinePriorityTypes.
@@ -22,6 +21,9 @@ public final class VirtualMachinePriorityTypes extends ExpandableStringEnum<Virt
 
     /** Static value Low for VirtualMachinePriorityTypes. */
     public static final VirtualMachinePriorityTypes LOW = fromString("Low");
+
+    /** Static value Spot for VirtualMachinePriorityTypes. */
+    public static final VirtualMachinePriorityTypes SPOT = fromString("Spot");
 
     /**
      * Creates or finds a VirtualMachinePriorityTypes from its string representation.

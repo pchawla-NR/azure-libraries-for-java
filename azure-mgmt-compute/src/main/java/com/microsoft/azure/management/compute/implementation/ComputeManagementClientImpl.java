@@ -10,8 +10,8 @@ package com.microsoft.azure.management.compute.implementation;
 
 import com.microsoft.azure.AzureClient;
 import com.microsoft.azure.AzureServiceClient;
-import com.microsoft.rest.RestClient;
 import com.microsoft.rest.credentials.ServiceClientCredentials;
+import com.microsoft.rest.RestClient;
 
 /**
  * Initializes a new instance of the ComputeManagementClientImpl class.
@@ -144,6 +144,45 @@ public class ComputeManagementClientImpl extends AzureServiceClient {
      */
     public AvailabilitySetsInner availabilitySets() {
         return this.availabilitySets;
+    }
+
+    /**
+     * The ProximityPlacementGroupsInner object to access its operations.
+     */
+    private ProximityPlacementGroupsInner proximityPlacementGroups;
+
+    /**
+     * Gets the ProximityPlacementGroupsInner object to access its operations.
+     * @return the ProximityPlacementGroupsInner object.
+     */
+    public ProximityPlacementGroupsInner proximityPlacementGroups() {
+        return this.proximityPlacementGroups;
+    }
+
+    /**
+     * The DedicatedHostGroupsInner object to access its operations.
+     */
+    private DedicatedHostGroupsInner dedicatedHostGroups;
+
+    /**
+     * Gets the DedicatedHostGroupsInner object to access its operations.
+     * @return the DedicatedHostGroupsInner object.
+     */
+    public DedicatedHostGroupsInner dedicatedHostGroups() {
+        return this.dedicatedHostGroups;
+    }
+
+    /**
+     * The DedicatedHostsInner object to access its operations.
+     */
+    private DedicatedHostsInner dedicatedHosts;
+
+    /**
+     * Gets the DedicatedHostsInner object to access its operations.
+     * @return the DedicatedHostsInner object.
+     */
+    public DedicatedHostsInner dedicatedHosts() {
+        return this.dedicatedHosts;
     }
 
     /**
@@ -355,6 +394,19 @@ public class ComputeManagementClientImpl extends AzureServiceClient {
     }
 
     /**
+     * The DiskEncryptionSetsInner object to access its operations.
+     */
+    private DiskEncryptionSetsInner diskEncryptionSets;
+
+    /**
+     * Gets the DiskEncryptionSetsInner object to access its operations.
+     * @return the DiskEncryptionSetsInner object.
+     */
+    public DiskEncryptionSetsInner diskEncryptionSets() {
+        return this.diskEncryptionSets;
+    }
+
+    /**
      * The GalleriesInner object to access its operations.
      */
     private GalleriesInner galleries;
@@ -391,6 +443,32 @@ public class ComputeManagementClientImpl extends AzureServiceClient {
      */
     public GalleryImageVersionsInner galleryImageVersions() {
         return this.galleryImageVersions;
+    }
+
+    /**
+     * The GalleryApplicationsInner object to access its operations.
+     */
+    private GalleryApplicationsInner galleryApplications;
+
+    /**
+     * Gets the GalleryApplicationsInner object to access its operations.
+     * @return the GalleryApplicationsInner object.
+     */
+    public GalleryApplicationsInner galleryApplications() {
+        return this.galleryApplications;
+    }
+
+    /**
+     * The GalleryApplicationVersionsInner object to access its operations.
+     */
+    private GalleryApplicationVersionsInner galleryApplicationVersions;
+
+    /**
+     * Gets the GalleryApplicationVersionsInner object to access its operations.
+     * @return the GalleryApplicationVersionsInner object.
+     */
+    public GalleryApplicationVersionsInner galleryApplicationVersions() {
+        return this.galleryApplicationVersions;
     }
 
     /**
@@ -442,6 +520,9 @@ public class ComputeManagementClientImpl extends AzureServiceClient {
         this.generateClientRequestId = true;
         this.operations = new OperationsInner(restClient().retrofit(), this);
         this.availabilitySets = new AvailabilitySetsInner(restClient().retrofit(), this);
+        this.proximityPlacementGroups = new ProximityPlacementGroupsInner(restClient().retrofit(), this);
+        this.dedicatedHostGroups = new DedicatedHostGroupsInner(restClient().retrofit(), this);
+        this.dedicatedHosts = new DedicatedHostsInner(restClient().retrofit(), this);
         this.virtualMachineExtensionImages = new VirtualMachineExtensionImagesInner(restClient().retrofit(), this);
         this.virtualMachineExtensions = new VirtualMachineExtensionsInner(restClient().retrofit(), this);
         this.virtualMachineImages = new VirtualMachineImagesInner(restClient().retrofit(), this);
@@ -458,9 +539,12 @@ public class ComputeManagementClientImpl extends AzureServiceClient {
         this.resourceSkus = new ResourceSkusInner(restClient().retrofit(), this);
         this.disks = new DisksInner(restClient().retrofit(), this);
         this.snapshots = new SnapshotsInner(restClient().retrofit(), this);
+        this.diskEncryptionSets = new DiskEncryptionSetsInner(restClient().retrofit(), this);
         this.galleries = new GalleriesInner(restClient().retrofit(), this);
         this.galleryImages = new GalleryImagesInner(restClient().retrofit(), this);
         this.galleryImageVersions = new GalleryImageVersionsInner(restClient().retrofit(), this);
+        this.galleryApplications = new GalleryApplicationsInner(restClient().retrofit(), this);
+        this.galleryApplicationVersions = new GalleryApplicationVersionsInner(restClient().retrofit(), this);
         this.containerServices = new ContainerServicesInner(restClient().retrofit(), this);
         this.azureClient = new AzureClient(this);
     }
