@@ -70,7 +70,7 @@ class FunctionAppsImpl
 
             @Override
             protected boolean filter(SiteInner inner) {
-                return "functionapp".equalsIgnoreCase(inner.kind());
+                return inner.kind() != null && Arrays.asList(inner.kind().split(",")).contains("functionapp");
             }
         };
     }
