@@ -15,6 +15,7 @@ import com.microsoft.azure.management.resources.fluentcore.model.Creatable;
 import com.microsoft.azure.management.resources.fluentcore.model.Refreshable;
 import com.microsoft.azure.management.resources.fluentcore.model.Updatable;
 import com.microsoft.azure.management.storage.StorageAccount;
+import com.microsoft.azure.management.storage.StorageAccountSkuType;
 import rx.Completable;
 import rx.Observable;
 
@@ -99,6 +100,21 @@ public interface FunctionApp extends
      * @return the completable of the operation
      */
     Completable removeFunctionKeyAsync(String functionName, String keyName);
+
+    /**
+     * Triggers a function.
+     * @param functionName the name of the function
+     * @param payload the payload to be serialized to JSON
+     */
+    void triggerFunction(String functionName, Object payload);
+
+    /**
+     * Triggers a function.
+     * @param functionName the name of the function
+     * @param payload the payload to be serialized to JSON
+     * @return the completable of the operation
+     */
+    Completable triggerFunctionAsync(String functionName, Object payload);
 
     /**
      * Syncs the triggers on the function app.
@@ -213,6 +229,13 @@ public interface FunctionApp extends
             WithCreate withNewConsumptionPlan();
 
             /**
+             * Creates a new Windows consumption plan to use.
+             * @param appServicePlanName the name of the new consumption plan
+             * @return the next stage of the definition
+             */
+            WithCreate withNewConsumptionPlan(String appServicePlanName);
+
+            /**
              * Creates a new Windows free app service plan. This will fail if there are 10 or more
              * free plans in the current subscription.
              *
@@ -238,6 +261,15 @@ public interface FunctionApp extends
             /**
              * Creates a new Windows app service plan to use.
              *
+             * @param appServicePlanName the name of the new app service plan
+             * @param pricingTier the sku of the app service plan
+             * @return the next stage of the definition
+             */
+            WithCreate withNewAppServicePlan(String appServicePlanName, PricingTier pricingTier);
+
+            /**
+             * Creates a new Windows app service plan to use.
+             *
              * @param appServicePlanCreatable the new app service plan creatable
              * @return the next stage of the definition
              */
@@ -250,12 +282,28 @@ public interface FunctionApp extends
             WithDockerContainerImage withNewLinuxConsumptionPlan();
 
             /**
+             * Creates a new Linux consumption plan to use.
+             * @param appServicePlanName the name of the new consumption plan
+             * @return the next stage of the definition
+             */
+            WithDockerContainerImage withNewLinuxConsumptionPlan(String appServicePlanName);
+
+            /**
              * Creates a new Linux app service plan to use.
              *
              * @param pricingTier the sku of the app service plan
              * @return the next stage of the definition
              */
             WithDockerContainerImage withNewLinuxAppServicePlan(PricingTier pricingTier);
+
+            /**
+             * Creates a new Linux app service plan to use.
+             *
+             * @param appServicePlanName the name of the new app service plan
+             * @param pricingTier the sku of the app service plan
+             * @return the next stage of the definition
+             */
+            WithDockerContainerImage withNewLinuxAppServicePlan(String appServicePlanName, PricingTier pricingTier);
 
             /**
              * Creates a new Linux app service plan to use.
@@ -274,11 +322,21 @@ public interface FunctionApp extends
         interface WithStorageAccount {
             /**
              * Creates a new storage account to use for the function app.
+             * @deprecated use {@link FunctionApp.DefinitionStages.WithStorageAccount#withNewStorageAccount(String, StorageAccountSkuType)} instead
              * @param name the name of the storage account
              * @param sku the sku of the storage account
              * @return the next stage of the definition
              */
+            @Deprecated
             WithCreate withNewStorageAccount(String name, com.microsoft.azure.management.storage.SkuName sku);
+
+            /**
+             * Creates a new storage account to use for the function app.
+             * @param name the name of the storage account
+             * @param sku the sku of the storage account
+             * @return the next stage of the definition
+             */
+            WithCreate withNewStorageAccount(String name, StorageAccountSkuType sku);
 
             /**
              * Specifies the storage account to use for the function app.
@@ -452,6 +510,13 @@ public interface FunctionApp extends
             Update withNewConsumptionPlan();
 
             /**
+             * Creates a new Windows consumption plan to use.
+             * @param appServicePlanName the name of the new consumption plan
+             * @return the next stage of the function app update
+             */
+            Update withNewConsumptionPlan(String appServicePlanName);
+
+            /**
              * Creates a new Windows free app service plan. This will fail if there are 10 or more
              * free plans in the current subscription.
              *
@@ -473,6 +538,15 @@ public interface FunctionApp extends
              * @return the next stage of the function app update
              */
             Update withNewAppServicePlan(PricingTier pricingTier);
+
+            /**
+             * Creates a new Windows app service plan to use.
+             *
+             * @param appServicePlanName the name of the new app service plan
+             * @param pricingTier the sku of the app service plan
+             * @return the next stage of the function app update
+             */
+            Update withNewAppServicePlan(String appServicePlanName, PricingTier pricingTier);
 
             /**
              * Creates a new Windows app service plan to use.
@@ -503,12 +577,28 @@ public interface FunctionApp extends
             Update withNewLinuxConsumptionPlan();
 
             /**
+             * Creates a new Linux consumption plan to use.
+             * @param appServicePlanName the name of the new consumption plan
+             * @return the next stage of the definition
+             */
+            Update withNewLinuxConsumptionPlan(String appServicePlanName);
+
+            /**
              * Creates a new Linux app service plan to use.
              *
              * @param pricingTier the sku of the app service plan
              * @return the next stage of the definition
              */
             Update withNewLinuxAppServicePlan(PricingTier pricingTier);
+
+            /**
+             * Creates a new Linux app service plan to use.
+             *
+             * @param appServicePlanName the name of the new app service plan
+             * @param pricingTier the sku of the app service plan
+             * @return the next stage of the definition
+             */
+            Update withNewLinuxAppServicePlan(String appServicePlanName, PricingTier pricingTier);
 
             /**
              * Creates a new Linux app service plan to use.
@@ -552,11 +642,21 @@ public interface FunctionApp extends
         interface WithStorageAccount {
             /**
              * Creates a new storage account to use for the function app.
+             * @deprecated use {@link FunctionApp.UpdateStages.WithStorageAccount#withNewStorageAccount(String, StorageAccountSkuType)} instead
              * @param name the name of the storage account
              * @param sku the sku of the storage account
              * @return the next stage of the function app update
              */
+            @Deprecated
             Update withNewStorageAccount(String name, com.microsoft.azure.management.storage.SkuName sku);
+
+            /**
+             * Creates a new storage account to use for the function app.
+             * @param name the name of the storage account
+             * @param sku the sku of the storage account
+             * @return the next stage of the function app update
+             */
+            Update withNewStorageAccount(String name, StorageAccountSkuType sku);
 
             /**
              * Specifies the storage account to use for the function app.

@@ -91,7 +91,7 @@ class FunctionAppsImpl
             @Override
             public Observable<FunctionApp> call(final SiteInner siteInner) {
                 if (siteInner == null) {
-                    return null;
+                    return Observable.just(null);
                 }
                 return Observable.zip(
                         self.inner().getConfigurationAsync(groupName, name),

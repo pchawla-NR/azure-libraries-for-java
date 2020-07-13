@@ -28,7 +28,6 @@ import com.microsoft.azure.management.compute.RunCommandInput;
 import com.microsoft.azure.management.compute.RunCommandInputParameter;
 import com.microsoft.azure.management.compute.RunCommandResult;
 import com.microsoft.azure.management.compute.SshConfiguration;
-import com.microsoft.azure.management.compute.SshPublicKey;
 import com.microsoft.azure.management.compute.StorageAccountTypes;
 import com.microsoft.azure.management.compute.UpgradeMode;
 import com.microsoft.azure.management.compute.UpgradePolicy;
@@ -163,7 +162,8 @@ public class VirtualMachineScaleSetImpl
     private String newProximityPlacementGroupName;
     // Type fo the new proximity placement group
     private ProximityPlacementGroupType newProximityPlacementGroupType;
-
+    // To manage OS profile
+    private boolean removeOsProfile;
 
     VirtualMachineScaleSetImpl(
             String name,
@@ -839,6 +839,13 @@ public class VirtualMachineScaleSetImpl
     }
 
     @Override
+    public VirtualMachineScaleSetImpl withSpecializedWindowsCustomImage(String customImageId) {
+        this.withWindowsCustomImage(customImageId);
+        this.removeOsProfile = true;
+        return this;
+    }
+
+    @Override
     public VirtualMachineScaleSetImpl withStoredWindowsImage(String imageUrl) {
         VirtualHardDisk userImageVhd = new VirtualHardDisk();
         userImageVhd.withUri(imageUrl);
@@ -913,6 +920,13 @@ public class VirtualMachineScaleSetImpl
     }
 
     @Override
+    public VirtualMachineScaleSetImpl withSpecializedLinuxCustomImage(String customImageId) {
+        this.withLinuxCustomImage(customImageId);
+        this.removeOsProfile = true;
+        return this;
+    }
+
+    @Override
     public VirtualMachineScaleSetImpl withStoredLinuxImage(String imageUrl) {
         VirtualHardDisk userImageVhd = new VirtualHardDisk();
         userImageVhd.withUri(imageUrl);
@@ -975,10 +989,10 @@ public class VirtualMachineScaleSetImpl
                 .osProfile();
         if (osProfile.linuxConfiguration().ssh() == null) {
             SshConfiguration sshConfiguration = new SshConfiguration();
-            sshConfiguration.withPublicKeys(new ArrayList<SshPublicKey>());
+            sshConfiguration.withPublicKeys(new ArrayList<SshPublicKeyInner>());
             osProfile.linuxConfiguration().withSsh(sshConfiguration);
         }
-        SshPublicKey sshPublicKey = new SshPublicKey();
+        SshPublicKeyInner sshPublicKey = new SshPublicKeyInner();
         sshPublicKey.withKeyData(publicKeyData);
         sshPublicKey.withPath("/home/" + osProfile.adminUsername() + "/.ssh/authorized_keys");
         osProfile.linuxConfiguration().ssh().publicKeys().add(sshPublicKey);
@@ -1633,7 +1647,7 @@ public class VirtualMachineScaleSetImpl
                 .virtualMachineProfile()
                 .osProfile();
         VirtualMachineScaleSetOSDisk osDisk = this.inner().virtualMachineProfile().storageProfile().osDisk();
-        if (isOSDiskFromImage(osDisk)) {
+        if (!removeOsProfile && isOSDiskFromImage(osDisk)) {
             // ODDisk CreateOption: FROM_IMAGE
             //
             if (this.osType() == OperatingSystemTypes.LINUX || this.isMarketplaceLinuxImage) {
@@ -2393,6 +2407,19 @@ public class VirtualMachineScaleSetImpl
     @Override
     public VirtualMachineScaleSetImpl withLowPriorityVirtualMachine(VirtualMachineEvictionPolicyTypes policy) {
         this.withLowPriorityVirtualMachine();
+        this.inner().virtualMachineProfile().withEvictionPolicy(policy);
+        return this;
+    }
+
+    @Override
+    public VirtualMachineScaleSetImpl withSpotPriorityVirtualMachine() {
+        this.withVirtualMachinePriority(VirtualMachinePriorityTypes.SPOT);
+        return this;
+    }
+
+    @Override
+    public VirtualMachineScaleSetImpl withSpotPriorityVirtualMachine(VirtualMachineEvictionPolicyTypes policy) {
+        this.withSpotPriorityVirtualMachine();
         this.inner().virtualMachineProfile().withEvictionPolicy(policy);
         return this;
     }

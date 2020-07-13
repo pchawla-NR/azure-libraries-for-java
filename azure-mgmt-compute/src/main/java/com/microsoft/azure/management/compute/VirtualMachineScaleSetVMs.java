@@ -6,7 +6,6 @@
 
 package com.microsoft.azure.management.compute;
 
-import com.microsoft.azure.management.apigeneration.Beta;
 import com.microsoft.azure.management.apigeneration.Fluent;
 import com.microsoft.azure.management.compute.implementation.VirtualMachineScaleSetVMsInner;
 import com.microsoft.azure.management.resources.fluentcore.collection.SupportsListing;
@@ -29,7 +28,6 @@ public interface VirtualMachineScaleSetVMs extends
      * @param instanceIds instance IDs of the virtual machine scale set instances to be deleted
      * @return a representation of the deferred computation of this call.
      */
-    @Beta(Beta.SinceVersion.V1_4_0)
     Completable deleteInstancesAsync(Collection<String> instanceIds);
 
     /**
@@ -38,7 +36,6 @@ public interface VirtualMachineScaleSetVMs extends
      * @param instanceIds instance IDs of the virtual machine scale set instances to be deleted
      * @return a representation of the deferred computation of this call.
      */
-    @Beta(Beta.SinceVersion.V1_4_0)
     Completable deleteInstancesAsync(String... instanceIds);
 
     /**
@@ -46,7 +43,6 @@ public interface VirtualMachineScaleSetVMs extends
      *
      * @param instanceIds instance IDs of the virtual machine scale set instances to be deleted
      */
-    @Beta(Beta.SinceVersion.V1_4_0)
     void deleteInstances(String... instanceIds);
 
     /**
@@ -69,7 +65,6 @@ public interface VirtualMachineScaleSetVMs extends
      * @param instanceIds instance IDs of the virtual machine scale set instances to be updated
      * @return a representation of the deferred computation of this call.
      */
-    @Beta(Beta.SinceVersion.V1_4_0)
     Completable updateInstancesAsync(Collection<String> instanceIds);
 
     /**
@@ -78,7 +73,6 @@ public interface VirtualMachineScaleSetVMs extends
      * @param instanceIds instance IDs of the virtual machine scale set instances to be updated
      * @return a representation of the deferred computation of this call.
      */
-    @Beta(Beta.SinceVersion.V1_4_0)
     Completable updateInstancesAsync(String... instanceIds);
 
     /**
@@ -86,6 +80,22 @@ public interface VirtualMachineScaleSetVMs extends
      *
      * @param instanceIds instance IDs of the virtual machine scale set instances to be updated
      */
-    @Beta(Beta.SinceVersion.V1_4_0)
     void updateInstances(String... instanceIds);
+
+    /**
+     * Simulates the eviction of the specified spot virtual machine in the scale set asynchronously.
+     * The eviction will occur with 30 minutes after calling this API.
+     *
+     * @param instanceId The instance ID of the virtual machine.
+     * @return a representation of the deferred computation of this call
+     */
+    Completable simulateEvictionAsync(String instanceId);
+
+    /**
+     * Simulates the eviction of the specified spot virtual machine in the scale set.
+     * The eviction will occur with 30 minutes after calling this API.
+     *
+     * @param instanceId The instance ID of the virtual machine.
+     */
+    void simulateEviction(String instanceId);
 }

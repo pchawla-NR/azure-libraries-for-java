@@ -43,7 +43,6 @@ import com.microsoft.azure.management.compute.RunCommandInput;
 import com.microsoft.azure.management.compute.RunCommandInputParameter;
 import com.microsoft.azure.management.compute.RunCommandResult;
 import com.microsoft.azure.management.compute.SshConfiguration;
-import com.microsoft.azure.management.compute.SshPublicKey;
 import com.microsoft.azure.management.compute.StorageAccountTypes;
 import com.microsoft.azure.management.compute.StorageProfile;
 import com.microsoft.azure.management.compute.VirtualHardDisk;
@@ -173,6 +172,8 @@ class VirtualMachineImpl
     private String newProximityPlacementGroupName;
     // Type fo the new proximity placement group
     private ProximityPlacementGroupType newProximityPlacementGroupType;
+    // To manage OS profile
+    private boolean removeOsProfile;
 
     VirtualMachineImpl(String name,
                        VirtualMachineInner innerModel,
@@ -315,6 +316,21 @@ class VirtualMachineImpl
     @Override
     public ServiceFuture<Void> redeployAsync(ServiceCallback<Void> callback) {
         return ServiceFuture.fromBody(this.redeployAsync(), callback);
+    }
+
+    @Override
+    public void simulateEviction() {
+        this.simulateEvictionAsync().await();
+    }
+
+    @Override
+    public Completable simulateEvictionAsync() {
+        return this.manager().inner().virtualMachines().simulateEvictionAsync(this.resourceGroupName(), this.name()).toCompletable();
+    }
+
+    @Override
+    public ServiceFuture<Void> simulateEvictionAsync(ServiceCallback<Void> callback) {
+        return ServiceFuture.fromBody(this.simulateEvictionAsync(), callback);
     }
 
     @Override
@@ -664,8 +680,22 @@ class VirtualMachineImpl
     }
 
     @Override
+    public VirtualMachineImpl withSpecializedWindowsCustomImage(String customImageId) {
+        this.withWindowsCustomImage(customImageId);
+        this.removeOsProfile = true;
+        return this;
+    }
+
+    @Override
     public VirtualMachineImpl withWindowsGalleryImageVersion(String galleryImageVersionId) {
         return this.withWindowsCustomImage(galleryImageVersionId);
+    }
+
+    @Override
+    public VirtualMachineImpl withSpecializedWindowsGalleryImageVersion(String galleryImageVersionId) {
+        this.withWindowsCustomImage(galleryImageVersionId);
+        this.removeOsProfile = true;
+        return this;
     }
 
     @Override
@@ -680,8 +710,22 @@ class VirtualMachineImpl
     }
 
     @Override
+    public VirtualMachineImpl withSpecializedLinuxCustomImage(String customImageId) {
+        this.withLinuxCustomImage(customImageId);
+        this.removeOsProfile = true;
+        return this;
+    }
+
+    @Override
     public VirtualMachineImpl withLinuxGalleryImageVersion(String galleryImageVersionId) {
         return this.withLinuxCustomImage(galleryImageVersionId);
+    }
+
+    @Override
+    public VirtualMachineImpl withSpecializedLinuxGalleryImageVersion(String galleryImageVersionId) {
+        this.withLinuxCustomImage(galleryImageVersionId);
+        this.removeOsProfile = true;
+        return this;
     }
 
     @Override
@@ -727,10 +771,10 @@ class VirtualMachineImpl
         OSProfile osProfile = this.inner().osProfile();
         if (osProfile.linuxConfiguration().ssh() == null) {
             SshConfiguration sshConfiguration = new SshConfiguration();
-            sshConfiguration.withPublicKeys(new ArrayList<SshPublicKey>());
+            sshConfiguration.withPublicKeys(new ArrayList<SshPublicKeyInner>());
             osProfile.linuxConfiguration().withSsh(sshConfiguration);
         }
-        SshPublicKey sshPublicKey = new SshPublicKey();
+        SshPublicKeyInner sshPublicKey = new SshPublicKeyInner();
         sshPublicKey.withKeyData(publicKeyData);
         sshPublicKey.withPath("/home/" + osProfile.adminUsername() + "/.ssh/authorized_keys");
         osProfile.linuxConfiguration().ssh().publicKeys().add(sshPublicKey);
@@ -1387,6 +1431,19 @@ class VirtualMachineImpl
     }
 
     @Override
+    public VirtualMachineImpl withSpotPriority() {
+        this.withPriority(VirtualMachinePriorityTypes.SPOT);
+        return this;
+    }
+
+    @Override
+    public VirtualMachineImpl withSpotPriority(VirtualMachineEvictionPolicyTypes policy) {
+        this.withSpotPriority();
+        this.inner().withEvictionPolicy(policy);
+        return this;
+    }
+
+    @Override
     public VirtualMachineImpl withMaxPrice(Double maxPrice) {
         this.inner().withBillingProfile(new BillingProfile().withMaxPrice(maxPrice));
         return this;
@@ -2033,7 +2090,7 @@ class VirtualMachineImpl
         }
         StorageProfile storageProfile = this.inner().storageProfile();
         OSDisk osDisk = storageProfile.osDisk();
-        if (isOSDiskFromImage(osDisk)) {
+        if (!removeOsProfile && isOSDiskFromImage(osDisk)) {
             // ODDisk CreateOption: FROM_IMAGE
             //
             if (osDisk.osType() == OperatingSystemTypes.LINUX || this.isMarketplaceLinuxImage) {

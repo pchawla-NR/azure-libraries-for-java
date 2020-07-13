@@ -340,7 +340,7 @@ public class VirtualMachineOperationsTests extends ComputeManagementTest {
                     .withProximityPlacementGroup(setCreated2.proximityPlacementGroup().id())
                     .apply();
         } catch (CloudException clEx) {
-            Assert.assertTrue(clEx.getMessage().equalsIgnoreCase("Changing property 'proximityPlacementGroup.id' is not allowed."));
+            Assert.assertTrue(clEx.getMessage().equalsIgnoreCase("Updating proximity placement group of VM javavm is not allowed while the VM is running. Please stop/deallocate the VM and retry the operation."));
         }
 
         // Delete VM
@@ -700,6 +700,40 @@ public class VirtualMachineOperationsTests extends ComputeManagementTest {
         Assert.assertNotNull(runResult);
         Assert.assertNotNull(runResult.value());
         Assert.assertTrue(runResult.value().size() > 0);
+    }
+
+    @Test
+    public void canPerformSimulateEvictionOnSpotVirtualMachine() {
+        VirtualMachine virtualMachine = computeManager.virtualMachines()
+                .define(VMNAME)
+                .withRegion(REGION)
+                .withNewResourceGroup(RG_NAME)
+                .withNewPrimaryNetwork("10.0.0.0/28")
+                .withPrimaryPrivateIPAddressDynamic()
+                .withoutPrimaryPublicIPAddress()
+                .withPopularLinuxImage(KnownLinuxVirtualMachineImage.UBUNTU_SERVER_16_04_LTS)
+                .withRootUsername("firstuser")
+                .withRootPassword("afh123RVS!")
+                .withSpotPriority(VirtualMachineEvictionPolicyTypes.DEALLOCATE)
+                .withSize(VirtualMachineSizeTypes.STANDARD_D2_V3)
+                .create();
+
+        Assert.assertNotNull(virtualMachine.osDiskStorageAccountType());
+        Assert.assertTrue(virtualMachine.osDiskSize() > 0);
+        Disk disk = computeManager.disks().getById(virtualMachine.osDiskId());
+        Assert.assertNotNull(disk);
+        Assert.assertEquals(DiskState.ATTACHED, disk.inner().diskState());
+
+        // call simulate eviction
+        virtualMachine.simulateEviction();
+        SdkContext.sleep(30 * 60 * 1000);
+
+        virtualMachine = computeManager.virtualMachines().getById(virtualMachine.id());
+        Assert.assertNotNull(virtualMachine);
+        Assert.assertNull(virtualMachine.osDiskStorageAccountType());
+        Assert.assertTrue(virtualMachine.osDiskSize() == 0);
+        disk = computeManager.disks().getById(virtualMachine.osDiskId());
+        Assert.assertEquals(DiskState.RESERVED, disk.inner().diskState());
     }
 
     private CreatablesInfo prepareCreatableVirtualMachines(Region region,

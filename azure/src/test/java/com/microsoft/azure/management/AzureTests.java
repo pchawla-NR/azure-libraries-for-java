@@ -602,6 +602,15 @@ public class AzureTests extends TestBase {
     }
 
     /**
+     * Tests the public IP prefix implementation.
+     * @throws Exception
+     */
+    @Test
+    public void testPublicIPPrefixes() throws Exception {
+        new TestPublicIPPrefix().runTest(azure.publicIPPrefixes(), azure.resourceGroups());
+    }
+
+    /**
      * Tests the availability set implementation.
      * @throws Exception
      */
@@ -714,6 +723,7 @@ public class AzureTests extends TestBase {
     }
 
     @Test
+    @Ignore("Not stable test cases")
     public void testNetworkWatcherFunctions() throws Exception {
         String nwrg = null;
         String tnwrg = null;
@@ -824,9 +834,9 @@ public class AzureTests extends TestBase {
 //            Assert.assertEquals(10, topology.resources().size());     // not sure why it is 18 now
         } finally {
             if (nwrg != null)
-                azure.resourceGroups().deleteByName(nwrg);
+                azure.resourceGroups().beginDeleteByName(nwrg);
             if (tnwrg != null)
-                azure.resourceGroups().deleteByName(tnwrg);
+                azure.resourceGroups().beginDeleteByName(tnwrg);
         }
     }
 
@@ -991,11 +1001,13 @@ public class AzureTests extends TestBase {
     }
 
     @Test
+    @Ignore("Deprecated")
     public void testBatchAI() throws Exception {
         new TestBatchAI.Basic(azure.storageAccounts(), azure.networks()).runTest(azure.batchAIWorkspaces(), azure.resourceGroups());
     }
 
     @Test
+    @Ignore("Deprecated")
     public void testBatchAIJob() throws Exception {
         final Region region = Region.US_EAST;
         final String groupName = SdkContext.randomResourceName("rg", 10);
@@ -1057,6 +1069,7 @@ public class AzureTests extends TestBase {
     }
 
     @Test
+    @Ignore("Deprecated")
     public void testBatchAIFileServer() throws Exception {
         new TestBatchAIFileServers(azure.networks()).runTest(azure.batchAIWorkspaces(), azure.resourceGroups());
     }
@@ -1104,10 +1117,8 @@ public class AzureTests extends TestBase {
 
     @Test
     public void testKubernetesCluster() throws Exception {
-        if (isPlaybackMode()) {
-            new TestKubernetesCluster()
-                .runTest(azure.kubernetesClusters(), azure.resourceGroups());
-        }
+        new TestKubernetesCluster()
+            .runTest(azure.kubernetesClusters(), azure.resourceGroups());
     }
 
     @Test

@@ -4,6 +4,9 @@
 trigger:
   - master
 
+pr:
+  - master
+
 variables:
   DefaultOptions: '--settings settings.xml -Dmaven.wagon.http.pool=false'
   LoggingOptions: '-Dorg.slf4j.simpleLogger.defaultLogLevel=error -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn'
@@ -28,7 +31,23 @@ jobs:
     pool:
       vmImage: $(OSVmImage)
       
-    steps:      
+    steps:
+      - task: ms-codeanalysis.vss-microsoft-security-code-analysis-devops.build-task-credscan.CredScan@2
+        displayName: 'Run Credential Scanner'
+        inputs:
+          toolMajorVersion: V2
+          suppressionsFile: './tools/credscan/CredScanSuppressions.json'
+
+      - task: ms-codeanalysis.vss-microsoft-security-code-analysis-devops.build-task-postanalysis.PostAnalysis@1
+        displayName: 'PostAnalysis'
+        inputs:
+          AllTools: false
+          BinSkim: false
+          CredScan: true
+          RoslynAnalyzers: false
+          TSLint: false
+          ToolLogsNotFoundAction: 'Standard'
+          
       - task: Maven@3
         displayName: 'install'
         inputs:

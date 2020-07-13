@@ -14,6 +14,7 @@ import com.microsoft.azure.Page;
 import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.management.appservice.AppSetting;
 import com.microsoft.azure.management.appservice.ConnectionString;
+import com.microsoft.azure.management.appservice.CsmPublishingProfileOptions;
 import com.microsoft.azure.management.appservice.CsmSlotEntity;
 import com.microsoft.azure.management.appservice.HostNameBinding;
 import com.microsoft.azure.management.appservice.MSDeploy;
@@ -102,7 +103,7 @@ abstract class DeploymentSlotBaseImpl<
     }
 
     public Observable<PublishingProfile> getPublishingProfileAsync() {
-        return manager().inner().webApps().listPublishingProfileXmlWithSecretsSlotAsync(resourceGroupName(), this.parent().name(), name(), null)
+        return manager().inner().webApps().listPublishingProfileXmlWithSecretsSlotAsync(resourceGroupName(), this.parent().name(), name(), new CsmPublishingProfileOptions())
                 .map(new Func1<InputStream, PublishingProfile>() {
                     @Override
                     public PublishingProfile call(InputStream stream) {
@@ -437,7 +438,7 @@ abstract class DeploymentSlotBaseImpl<
 
     @Override
     public Completable verifyDomainOwnershipAsync(String certificateOrderName, String domainVerificationToken) {
-        IdentifierInner identifierInner = new IdentifierInner().withIdentifierId(domainVerificationToken);
+        IdentifierInner identifierInner = new IdentifierInner().withValue(domainVerificationToken);
         return manager().inner().webApps().createOrUpdateDomainOwnershipIdentifierSlotAsync(resourceGroupName(), parent().name(), name(), certificateOrderName, identifierInner)
                 .map(new Func1<IdentifierInner, Void>() {
                     @Override

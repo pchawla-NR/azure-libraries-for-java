@@ -29,6 +29,7 @@ import com.microsoft.azure.management.network.VirtualMachineScaleSetNicIPConfigu
 import com.microsoft.azure.management.resources.ResourceGroup;
 import com.microsoft.azure.management.resources.fluentcore.arm.AvailabilityZoneId;
 import com.microsoft.azure.management.resources.fluentcore.arm.Region;
+import com.microsoft.azure.management.resources.fluentcore.utils.SdkContext;
 import com.microsoft.azure.management.storage.StorageAccount;
 import com.microsoft.azure.management.storage.StorageAccountKey;
 import com.microsoft.azure.storage.CloudStorageAccount;
@@ -90,7 +91,7 @@ public class VirtualMachineScaleSetOperationsTests extends ComputeManagementTest
         Assert.assertTrue(keys.size() > 0);
         String storageAccountKey = keys.get(0).value();
 
-        final String storageConnectionString = String.format("DefaultEndpointsProtocol=http;AccountName=%s;AccountKey=%s",
+        final String storageConnectionString = String.format("DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s",
                 storageAccount.name(),
                 storageAccountKey);
         // Get the script to upload
@@ -206,7 +207,7 @@ public class VirtualMachineScaleSetOperationsTests extends ComputeManagementTest
         final String vmssName = generateRandomResourceName("vmss", 10);
         final String uname = "jvuser";
         final String password = "123OData!@#123";
-        final String apacheInstallScript = "https://raw.githubusercontent.com/Azure/azure-libraries-for-java/master/azure-mgmt-compute/src/test/assets/install_apache.sh";
+        final String apacheInstallScript = "https://raw.githubusercontent.com/Azure/azure-libraries-for-net/master/Samples/Asset/install_apache.sh";
         final String installCommand = "bash install_apache.sh Abc.123x(";
         List<String> fileUris = new ArrayList<>();
         fileUris.add(apacheInstallScript);
@@ -1143,6 +1144,56 @@ public class VirtualMachineScaleSetOperationsTests extends ComputeManagementTest
         Assert.assertEquals(vmss.billingProfile().maxPrice(), (Double)2000.0);
     }
 
+    @Test
+    public void canPerformSimulateEvictionOnSpotVMSSInstance() {
+        final String vmssName = generateRandomResourceName("vmss", 10);
+
+        ResourceGroup resourceGroup = this.resourceManager.resourceGroups()
+                .define(RG_NAME)
+                .withRegion(REGION)
+                .create();
+
+        Network network = this.networkManager
+                .networks()
+                .define("vmssvnet")
+                .withRegion(REGION)
+                .withExistingResourceGroup(resourceGroup)
+                .withAddressSpace("10.0.0.0/28")
+                .withSubnet("subnet1", "10.0.0.0/28")
+                .create();
+
+        VirtualMachineScaleSet vmss = computeManager.virtualMachineScaleSets()
+                .define(vmssName)
+                .withRegion(REGION)
+                .withExistingResourceGroup(RG_NAME)
+                .withSku(VirtualMachineScaleSetSkuTypes.STANDARD_D3_V2)
+                .withExistingPrimaryNetworkSubnet(network, "subnet1")
+                .withoutPrimaryInternetFacingLoadBalancer()
+                .withoutPrimaryInternalLoadBalancer()
+                .withPopularLinuxImage(KnownLinuxVirtualMachineImage.UBUNTU_SERVER_16_04_LTS)
+                .withRootUsername("jvuser")
+                .withRootPassword("123OData!@#123")
+                .withSpotPriorityVirtualMachine(VirtualMachineEvictionPolicyTypes.DEALLOCATE)
+                .create();
+
+        PagedList<VirtualMachineScaleSetVM> vmInstances = vmss.virtualMachines().list();
+        for (VirtualMachineScaleSetVM instance: vmInstances) {
+            Assert.assertTrue(instance.osDiskSizeInGB() > 0);
+            //Disk disk = computeManager.disks().getById(instance.osDiskId());
+            //Assert.assertEquals(DiskState.ATTACHED, disk.inner().diskState());
+            // call simulate eviction
+            vmss.virtualMachines().simulateEviction(instance.instanceId());
+        }
+
+        SdkContext.sleep(30 * 60 * 1000);
+
+        for (VirtualMachineScaleSetVM instance: vmInstances) {
+            instance.refresh();
+            Assert.assertTrue(instance.osDiskSizeInGB() == 0);
+            //Disk disk = computeManager.disks().getById(instance.osDiskId());
+            //Assert.assertEquals(DiskState.RESERVED, disk.inner().diskState());
+        }
+    }
 
     private void checkVmsEqual(VirtualMachineScaleSetVM original, VirtualMachineScaleSetVM fetched)
     {
