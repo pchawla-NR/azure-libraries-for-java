@@ -24,6 +24,7 @@ import com.microsoft.azure.management.resources.fluentcore.model.Indexable;
 import com.microsoft.azure.management.resources.fluentcore.utils.SdkContext;
 import com.microsoft.azure.management.storage.StorageAccount;
 import com.microsoft.azure.management.storage.StorageAccountKey;
+import com.microsoft.azure.management.storage.StorageAccountSkuType;
 import com.microsoft.rest.LogLevel;
 import com.microsoft.rest.credentials.TokenCredentials;
 import okhttp3.HttpUrl;
@@ -71,12 +72,16 @@ class FunctionAppImpl
     private static final String SETTING_FUNCTIONS_EXTENSION_VERSION = "FUNCTIONS_EXTENSION_VERSION";
     private static final String SETTING_WEBSITE_CONTENTAZUREFILECONNECTIONSTRING = "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING";
     private static final String SETTING_WEBSITE_CONTENTSHARE = "WEBSITE_CONTENTSHARE";
+    private static final String SETTING_WEB_JOBS_STORAGE = "AzureWebJobsStorage";
+    private static final String SETTING_WEB_JOBS_DASHBOARD = "AzureWebJobsDashboard";
 
     private Creatable<StorageAccount> storageAccountCreatable;
     private StorageAccount storageAccountToSet;
     private StorageAccount currentStorageAccount;
     private final FunctionAppKeyService functionAppKeyService;
     private FunctionService functionService;
+    private FunctionServiceViaKey functionServiceViaKey;
+    private String cachedFunctionAppMasterKey;
     private FunctionDeploymentSlots deploymentSlots;
 
     private Func1<AppServicePlan, Void> linuxFxVersionSetter = null;
@@ -102,6 +107,11 @@ class FunctionAppImpl
                     .withLogLevel(LogLevel.BODY_AND_HEADERS)
                     .build()
                     .retrofit().create(FunctionService.class);
+            functionServiceViaKey = manager().restClient().newBuilder()
+                    .withBaseUrl(defaultHostName.toString())
+                    .withLogLevel(LogLevel.BODY_AND_HEADERS)
+                    .build()
+                    .retrofit().create(FunctionServiceViaKey.class);
         }
     }
 
@@ -121,6 +131,11 @@ class FunctionAppImpl
     @Override
     public FunctionAppImpl withNewConsumptionPlan() {
         return withNewAppServicePlan(OperatingSystem.WINDOWS, new PricingTier(SkuName.DYNAMIC.toString(), "Y1"));
+    }
+
+    @Override
+    public FunctionAppImpl withNewConsumptionPlan(String appServicePlanName) {
+        return withNewAppServicePlan(appServicePlanName, OperatingSystem.WINDOWS, new PricingTier(SkuName.DYNAMIC.toString(), "Y1"));
     }
 
     @Override
@@ -175,14 +190,14 @@ class FunctionAppImpl
                 .first().zipWith(cachedAppServicePlanObservable, new Func2<StorageAccountKey, AppServicePlan, Observable<Indexable>>() {
                     @Override
                     public Observable<Indexable> call(StorageAccountKey storageAccountKey, AppServicePlan appServicePlan) {
-                        String connectionString = String.format("DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s",
-                                storageAccountToSet.name(), storageAccountKey.value());
-                        withAppSetting("AzureWebJobsStorage", connectionString);
-                        withAppSetting("AzureWebJobsDashboard", connectionString);
+                        String connectionString = com.microsoft.azure.management.resources.fluentcore.utils.Utils.getStorageConnectionString(
+                                storageAccountToSet.name(), storageAccountKey.value(), manager().restClient());
+                        addAppSettingIfNotModified(SETTING_WEB_JOBS_STORAGE, connectionString);
+                        addAppSettingIfNotModified(SETTING_WEB_JOBS_DASHBOARD, connectionString);
                         if (OperatingSystem.WINDOWS.equals(operatingSystem()) && // as Portal logic, only Windows plan would have following appSettings
                                 (appServicePlan == null || isConsumptionOrPremiumAppServicePlan(appServicePlan.pricingTier()))) {
-                            withAppSetting(SETTING_WEBSITE_CONTENTAZUREFILECONNECTIONSTRING, connectionString);
-                            withAppSetting(SETTING_WEBSITE_CONTENTSHARE, SdkContext.randomResourceName(name(), 32));
+                            addAppSettingIfNotModified(SETTING_WEBSITE_CONTENTAZUREFILECONNECTIONSTRING, connectionString);
+                            addAppSettingIfNotModified(SETTING_WEBSITE_CONTENTSHARE, SdkContext.randomResourceName(name(), 32));
                         }
                         return FunctionAppImpl.super.submitAppSettings();
                     }
@@ -196,6 +211,24 @@ class FunctionAppImpl
                     }
                 });
         }
+    }
+
+    @Override
+    public OperatingSystem operatingSystem() {
+        return (inner().reserved() == null || !inner().reserved())
+                ? OperatingSystem.WINDOWS
+                : OperatingSystem.LINUX;
+    }
+
+    private void addAppSettingIfNotModified(String key, String value) {
+        if (!appSettingModified(key)) {
+            withAppSetting(key, value);
+        }
+    }
+
+    private boolean appSettingModified(String key) {
+        return (appSettingsToAdd != null && appSettingsToAdd.containsKey(key))
+                || (appSettingsToRemove != null && appSettingsToRemove.contains(key));
     }
 
     private static boolean isConsumptionOrPremiumAppServicePlan(PricingTier pricingTier) {
@@ -217,6 +250,11 @@ class FunctionAppImpl
     @Override
     FunctionAppImpl withNewAppServicePlan(OperatingSystem operatingSystem, PricingTier pricingTier) {
         return super.withNewAppServicePlan(operatingSystem, pricingTier).autoSetAlwaysOn(pricingTier);
+    }
+
+    @Override
+    FunctionAppImpl withNewAppServicePlan(String appServicePlan, OperatingSystem operatingSystem, PricingTier pricingTier) {
+        return super.withNewAppServicePlan(appServicePlan, operatingSystem, pricingTier).autoSetAlwaysOn(pricingTier);
     }
 
     @Override
@@ -256,6 +294,24 @@ class FunctionAppImpl
     }
 
     @Override
+    public FunctionAppImpl withNewStorageAccount(String name, StorageAccountSkuType sku) {
+        StorageAccount.DefinitionStages.WithGroup storageDefine = manager().storageManager().storageAccounts()
+                .define(name)
+                .withRegion(regionName());
+        if (super.creatableGroup != null && isInCreateMode()) {
+            storageAccountCreatable = storageDefine.withNewResourceGroup(super.creatableGroup)
+                    .withGeneralPurposeAccountKind()
+                    .withSku(sku);
+        } else {
+            storageAccountCreatable = storageDefine.withExistingResourceGroup(resourceGroupName())
+                    .withGeneralPurposeAccountKind()
+                    .withSku(sku);
+        }
+        this.addDependency(storageAccountCreatable);
+        return this;
+    }
+
+    @Override
     public FunctionAppImpl withExistingStorageAccount(StorageAccount storageAccount) {
         this.storageAccountToSet = storageAccount;
         return this;
@@ -272,15 +328,24 @@ class FunctionAppImpl
         return withDailyUsageQuota(0);
     }
 
-
     @Override
     public FunctionAppImpl withNewLinuxConsumptionPlan() {
         return withNewAppServicePlan(OperatingSystem.LINUX, new PricingTier(SkuName.DYNAMIC.toString(), "Y1"));
     }
 
     @Override
+    public FunctionAppImpl withNewLinuxConsumptionPlan(String appServicePlanName) {
+        return withNewAppServicePlan(appServicePlanName, OperatingSystem.LINUX, new PricingTier(SkuName.DYNAMIC.toString(), "Y1"));
+    }
+
+    @Override
     public FunctionAppImpl withNewLinuxAppServicePlan(PricingTier pricingTier) {
-        return super.withNewAppServicePlan(OperatingSystem.LINUX, pricingTier).autoSetAlwaysOn(pricingTier);
+        return super.withNewAppServicePlan(OperatingSystem.LINUX, pricingTier);
+    }
+
+    @Override
+    public FunctionAppImpl withNewLinuxAppServicePlan(String appServicePlanName, PricingTier pricingTier) {
+        return super.withNewAppServicePlan(appServicePlanName, OperatingSystem.LINUX, pricingTier);
     }
 
     @Override
@@ -323,47 +388,23 @@ class FunctionAppImpl
     @Override
     public FunctionAppImpl withPublicDockerHubImage(String imageAndTag) {
         ensureLinuxPlan();
-        cleanUpContainerSettings();
-        if (siteConfig == null) {
-            siteConfig = new SiteConfigResourceInner();
-        }
-        siteConfig.withLinuxFxVersion(String.format("DOCKER|%s", imageAndTag));
-        withAppSetting(SETTING_DOCKER_IMAGE, imageAndTag);
-        return this;
+        return super.withPublicDockerHubImage(imageAndTag);
     }
 
     @Override
     public FunctionAppImpl withPrivateDockerHubImage(String imageAndTag) {
-        return withPublicDockerHubImage(imageAndTag);
+        ensureLinuxPlan();
+        return super.withPublicDockerHubImage(imageAndTag);
     }
 
     @Override
     public FunctionAppImpl withPrivateRegistryImage(String imageAndTag, String serverUrl) {
         ensureLinuxPlan();
-        cleanUpContainerSettings();
-        if (siteConfig == null) {
-            siteConfig = new SiteConfigResourceInner();
-        }
-        siteConfig.withLinuxFxVersion(String.format("DOCKER|%s", imageAndTag));
-        withAppSetting(SETTING_DOCKER_IMAGE, imageAndTag);
-        withAppSetting(SETTING_REGISTRY_SERVER, serverUrl);
-        return this;
+        return super.withPrivateRegistryImage(imageAndTag, serverUrl);
     }
 
     @Override
-    public FunctionAppImpl withCredentials(String username, String password) {
-        withAppSetting(SETTING_REGISTRY_USERNAME, username);
-        withAppSetting(SETTING_REGISTRY_PASSWORD, password);
-        return this;
-    }
-
-    private void ensureLinuxPlan() {
-        if (OperatingSystem.WINDOWS.equals(operatingSystem())) {
-            throw new IllegalArgumentException("Docker container settings only apply to Linux app service plans.");
-        }
-    }
-
-    private void cleanUpContainerSettings() {
+    protected void cleanUpContainerSettings() {
         linuxFxVersionSetter = null;
         if (siteConfig != null && siteConfig.linuxFxVersion() != null) {
             siteConfig.withLinuxFxVersion(null);
@@ -400,11 +441,11 @@ class FunctionAppImpl
 
     @Override
     public Observable<String> getMasterKeyAsync() {
-        return functionAppKeyService.getMasterKey(resourceGroupName(), name(), manager().subscriptionId(), "2016-08-01", manager().inner().userAgent())
-                .map(new Func1<Map<String, String>, String>() {
+        return functionAppKeyService.getMasterKey(resourceGroupName(), name(), manager().subscriptionId(), "2019-08-01", manager().inner().userAgent())
+                .map(new Func1<ListKeysResult, String>() {
                     @Override
-                    public String call(Map<String, String> stringStringMap) {
-                        return stringStringMap.get("masterKey");
+                    public String call(ListKeysResult keys) {
+                        return keys.getMasterKey();
                     }
                 });
     }
@@ -453,6 +494,35 @@ class FunctionAppImpl
     @Override
     public Completable removeFunctionKeyAsync(String functionName, String keyName) {
         return functionService.deleteFunctionKey(functionName, keyName).toCompletable();
+    }
+
+    @Override
+    public void triggerFunction(String functionName, Object payload) {
+        triggerFunctionAsync(functionName, payload).toObservable().toBlocking().subscribe();
+    }
+
+    @Override
+    public Completable triggerFunctionAsync(final String functionName, final Object payload) {
+        return getCachedMasterKey().flatMap(new Func1<String, Observable<Void>>() {
+            @Override
+            public Observable<Void> call(String s) {
+                return functionServiceViaKey.triggerFunction(s, functionName, payload);
+            }
+        }).toCompletable();
+    }
+
+    private Observable<String> getCachedMasterKey() {
+        if (cachedFunctionAppMasterKey != null) {
+            return Observable.just(cachedFunctionAppMasterKey);
+        } else {
+            return this.getMasterKeyAsync().map(new Func1<String, String>() {
+                @Override
+                public String call(String s) {
+                    cachedFunctionAppMasterKey = s;
+                    return s;
+                }
+            });
+        }
     }
 
     @Override
@@ -586,10 +656,25 @@ class FunctionAppImpl
         return super.afterPostRunAsync(isGroupFaulted);
     }
 
+    private static class ListKeysResult {
+        @JsonProperty("masterKey")
+        private String masterKey;
+
+        @JsonProperty("functionKeys")
+        private Map<String, String> functionKeys;
+
+        @JsonProperty("systemKeys")
+        private Map<String, String> systemKeys;
+
+        public String getMasterKey() {
+            return masterKey;
+        }
+    }
+
     private interface FunctionAppKeyService {
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.azure.management.appservice.WebApps getMasterKey" })
-        @GET("subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/functions/admin/masterkey")
-        Observable<Map<String, String>> getMasterKey(@Path("resourceGroupName") String resourceGroupName, @Path("name") String name, @Path("subscriptionId") String subscriptionId, @Query("api-version") String apiVersion, @Header("User-Agent") String userAgent);
+        @POST("subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/host/default/listkeys")
+        Observable<ListKeysResult> getMasterKey(@Path("resourceGroupName") String resourceGroupName, @Path("name") String name, @Path("subscriptionId") String subscriptionId, @Query("api-version") String apiVersion, @Header("User-Agent") String userAgent);
     }
 
     private interface FunctionService {
@@ -616,6 +701,12 @@ class FunctionAppImpl
         @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.azure.management.appservice.WebApps getHostStatus" })
         @GET("admin/host/status")
         Observable<Void> getHostStatus();
+    }
+
+    private interface FunctionServiceViaKey {
+        @Headers({ "Content-Type: application/json; charset=utf-8", "x-ms-logging-context: com.microsoft.azure.management.appservice.WebApps triggerFunction" })
+        @POST("admin/functions/{name}")
+        Observable<Void> triggerFunction(@Header("x-functions-key") String key, @Path("name") String functionName, @Body Object payload);
     }
 
     private static class FunctionKeyListResult {

@@ -1,9 +1,13 @@
 [![Build Status](https://dev.azure.com/azure-sdk/public/_apis/build/status/fluentJava/Azure.azure-libraries-for-java?branchName=master)](https://dev.azure.com/azure-sdk/public/_build/latest?definitionId=608&branchName=master)
 [![Build Status](https://travis-ci.org/Azure/azure-libraries-for-java.svg?style=flat-square&label=build&branch=master)](https://travis-ci.org/Azure/azure-libraries-for-java)
 
+# Try the Next-Generation Azure Management SDK for Java now
+
+A new set of Azure Management Libraries for Java that follows the [Azure SDK Design Guidelines for Java](https://azure.github.io/azure-sdk/java_introduction.html) are now in public preview. If you are interested in the new generation SDK for Java, please find more details [here](https://github.com/Azure/azure-sdk-for-java/tree/master/sdk/management).
+
 # Azure Management Libraries for Java
 
-This README is based on the released stable version (1.29.0). If you are looking for other releases, see [More Information](#more-information).
+This README is based on the released stable version (1.35.1). If you are looking for other releases, see [More Information](#more-information).
 
 The Azure Management Libraries for Java is a higher-level, object-oriented API for *managing* Azure resources, that is optimized for ease of use, succinctness and consistency.
 
@@ -25,7 +29,7 @@ If you are looking for Java client libraries for *consuming* (rather than *manag
 * [More information](#more-information)
 
 ## Feature Availability and Road Map
-:triangular_flag_on_post: *as of Version 1.29.0*
+:triangular_flag_on_post: *as of Version 1.35.1*
 
 <table>
   <tr>
@@ -173,6 +177,8 @@ You can create a virtual machine scale set instance by using a `define() … cre
 <li><a href="https://github.com/Azure-Samples/compute-java-manage-vmss-in-availability-zones">Manage virtual machine scale sets in availability zones</a></li>
 
 <li><a href="https://github.com/Azure-Samples/compute-java-list-compute-skus">List compute SKUs</a></li>
+<li><a href="https://github.com/Azure-Samples/compute-java-manage-managed-disks">Manage virtual machine with managed disks</li>
+<li><a href="https://github.com/Azure-Samples/compute-java-manage-virtual-machine-with-disks">Manage virtual machine with disks</li>
 
 </ul></td>
   </tr>
@@ -304,6 +310,7 @@ ApplicationGateway applicationGateway = azure.applicationGateways().define("myFi
     <td>Traffic Manager</td>
     <td><ul style="list-style-type:circle">
 <li><a href="https://github.com/Azure-Samples/traffic-manager-java-manage-profiles">Manage traffic manager profiles</a></li>
+<li><a href="https://github.com/Azure-Samples/traffic-manager-java-manage-simple-profiles">Manage simple traffic manager profiles</a></li>
 </ul></td>
   </tr>
 
@@ -362,6 +369,7 @@ WebApp webApp = azure.webApps()
 <li><a href="https://github.com/Azure-Samples/app-service-java-manage-authentication-for-web-apps">Manage authentication for Web apps</a></li>
 <li><a href="https://github.com/Azure-Samples/app-service-java-access-key-vault-by-msi-for-web-apps">Safegaurd Web app secrets in Key Vault</a></li>
 <li><a href="https://github.com/Azure-Samples/app-service-java-access-key-vault-convenience-for-web-apps">Safegaurd Web app secrets in Key Vault using convenience API</a></li>
+<li><a href="https://github.com/Azure-Samples/app-service-java-manage-logs-for-web-apps">Get logs for Web apps</a></li>
 </ul></td>
   </tr>
 
@@ -375,6 +383,7 @@ WebApp webApp = azure.webApps()
 <li><a href="https://github.com/Azure-Samples/app-service-java-scale-web-apps-on-linux">Scale Web apps</a></li>
 <li><a href="https://github.com/Azure-Samples/app-service-java-manage-storage-connections-for-web-apps-on-linux">Manage storage connections for Web apps</a></li>
 <li><a href="https://github.com/Azure-Samples/app-service-java-manage-data-connections-for-web-apps-on-linux">Manage data connections (such as SQL database and Redis cache) for Web apps</a></li>
+<li><a href="https://github.com/Azure-Samples/app-service-java-access-key-vault-convenience-for-web-apps-on-linux">Safegaurd Web app secrets in Key Vault on Linux</a></li>
 </ul></td>
   </tr>
 
@@ -459,19 +468,21 @@ SqlDatabase database = sqlServer.databases().define("myNewDatabase")
 <li><a href="https://github.com/Azure-Samples/sql-database-java-manage-recover-restore-db">Restore and recover SQL databases</a></li>
 <li><a href="https://github.com/Azure-Samples/sql-database-java-get-sql-metrics">Get SQL Database metrics</a></li>
 <li><a href="https://github.com/Azure-Samples/sql-database-java-manage-failover-groups">Manage SQL Database Failover Groups</a></li>
-<li><a href="https://github.com/Azure-Samples/sql-database-java-manage-sql-server-dns-aliases">Manage SQL Server DNL aliases</a></li>
+<li><a href="https://github.com/Azure-Samples/sql-database-java-manage-sql-server-dns-aliases">Manage SQL Server DNS aliases</a></li>
 <li><a href="https://github.com/Azure-Samples/sql-database-java-manage-sql-secrets-in-key-vault">Manage SQL secrets (Server Keys) in Azure Key Vault</a></li>
 <li><a href="https://github.com/Azure-Samples/sql-database-java-manage-virtual-network-rules">Manage SQL Virtual Network Rules</a></li>
+<li><a href="https://github.com/Azure-Samples/sql-database-java-manage-sql-server-security-alert-policy">Manage SQL Server Security Alert Policy</a></li>
 </ul></td>
   </tr>
 
   <tr>
     <td>Cosmos DB</td>
     <td><ul style="list-style-type:circle">
-<li><a href="https://github.com/Azure-Samples/cosmosdb-java-create-documentdb-and-configure-for-high-availability">Create a CosmosDB and configure it for high availability</a></li>
-<li><a href="https://github.com/Azure-Samples/cosmosdb-java-create-documentdb-and-configure-for-eventual-consistency">Create a CosmosDB and configure it with eventual consistency</a></li>
-<li><a href="https://github.com/Azure-Samples/cosmosdb-java-create-documentdb-and-configure-firewall">Create a CosmosDB, configure it for high availability and create a firewall to limit access from an approved set of IP addresses</li>
-<li><a href="https://github.com/Azure-Samples/cosmosdb-java-create-documentdb-and-get-mongodb-connection-string">Create a CosmosDB and get MongoDB connection string</li>
+<li><a href="https://github.com/Azure-Samples/cosmosdb-java-create-cosmosdb-and-configure-for-high-availability">Create a CosmosDB and configure it for high availability</a></li>
+<li><a href="https://github.com/Azure-Samples/cosmosdb-java-create-cosmosdb-and-configure-for-eventual-consistency">Create a CosmosDB and configure it with eventual consistency</a></li>
+<li><a href="https://github.com/Azure-Samples/cosmosdb-java-create-cosmosdb-and-configure-firewall">Create a CosmosDB, configure it for high availability and create a firewall to limit access from an approved set of IP addresses</li>
+<li><a href="https://github.com/Azure-Samples/cosmosdb-java-create-cosmosdb-and-get-mongodb-connection-string">Create a CosmosDB and get MongoDB connection string</li>
+<li><a href="https://github.com/Azure-Samples/cosmosdb-java-create-cosmosdb-table-with-virtual-network-rule">Create a CosmosDB Table with a virtual network rule</li>
 </ul></td>
   </tr>
 
@@ -489,6 +500,7 @@ SqlDatabase database = sqlServer.databases().define("myNewDatabase")
     <td>Active Directory</td>
     <td><ul style="list-style-type:circle">
 <li><a href="https://github.com/Azure-Samples/aad-java-manage-service-principals">Manage service principals using Java</a></li>
+<li><a href="https://github.com/Azure-Samples/aad-java-manage-service-principal-credentials">Manage credentials for service principals using Java</a></li>
 <li><a href="https://github.com/Azure-Samples/aad-java-manage-users-groups-and-roles">Manage users and groups and manage their roles</a></li>
 <li><a href="https://github.com/Azure-Samples/aad-java-manage-passwords">Manage passwords</li>
 <li><a href="https://github.com/Azure-Samples/compute-java-manage-resources-from-vm-with-msi-in-aad-group">Manage Azure resources from a managed service identity (MSI) enabled virtual machine that belongs to an Azure Active Directory (AAD) security group</a></li>
@@ -502,6 +514,7 @@ SqlDatabase database = sqlServer.databases().define("myNewDatabase")
 <li><a href="https://github.com/Azure-Samples/acr-java-manage-azure-container-registry-with-webhooks">Manage container registry with Web hooks</a></li>
 <li><a href="https://github.com/Azure-Samples/aks-java-manage-kubernetes-cluster">Manage Kubernetes cluster (AKS)</a></li>
 <li><a href="https://github.com/Azure-Samples/aks-java-deploy-image-from-acr-to-kubernetes">Deploy an image from container registry to Kubernetes cluster (AKS)</a></li>
+<li><a href="https://github.com/Azure-Samples/aks-java-manage-kubernetes-cluster-with-advanced-networking">Manage Kubernetes clusters with advanced networking</a></li>
 
 <li><a href="https://github.com/Azure-Samples/acs-java-deploy-image-from-acr-to-acs-orchestrator">Deploy an image from container registry to ACS with Kubernetes orchestrator</a></li>
 <!--
@@ -533,7 +546,10 @@ SqlDatabase database = sqlServer.databases().define("myNewDatabase")
 <li><a href="https://github.com/Azure-Samples/resources-java-manage-resource-group">Manage resource groups</a></li>
 <li><a href="https://github.com/Azure-Samples/resources-java-manage-resource">Manage resources</a></li>
 <li><a href="https://github.com/Azure-Samples/locks-java-manage-locks">Manage resource locks</a></li>
+<li><a href="https://github.com/Azure-Samples/resources-java-web-server-with-delegated-credentials">Manage delegated credentials</a></li>
 <li><a href="https://github.com/Azure-Samples/resources-java-deploy-using-arm-template">Deploy resources with ARM templates</a></li>
+<li><a href="https://github.com/Azure-Samples/resources-java-deploy-using-arm-template-async">Deploy resources with ARM templates asynchronously</a></li>
+<li><a href="https://github.com/Azure-Samples/resources-java-deploy-using-arm-template-with-deployment-operations">Deploy resources with ARM templates with deployment operations</a></li>
 <li><a href="https://github.com/Azure-Samples/resources-java-deploy-using-arm-template-with-progress">Deploy resources with ARM templates (with progress)</a></li>
 <li><a href="https://github.com/Azure-Samples/resources-java-deploy-virtual-machine-with-managed-disks-using-arm-template">Deploy a virtual machine with managed disks using an ARM template</li></ul></td>
   </tr>
@@ -603,17 +619,52 @@ SqlDatabase database = sqlServer.databases().define("myNewDatabase")
 
 </table>
 
+### Use single library
+
+For instance, if you only need azure-mgmt-appservice library from 1.35.1, and wish to limit the dependencies, using following dependency instead in POM.
+
+```xml
+<dependency>
+    <groupId>com.microsoft.azure</groupId>
+    <artifactId>azure-mgmt-appservice</artifactId>
+    <version>1.35.1</version>
+</dependency>
+<dependency>
+    <groupId>com.microsoft.azure</groupId>
+    <artifactId>azure-client-authentication</artifactId>
+    <version>1.7.0</version>
+</dependency>
+```
+
+Create an authenticated client similarly as `Azure.authenticate`, with credentials and subscription id - see [how to create authentication info](./AUTH.md).
+
+```java
+ApplicationTokenCredentials credentials = ...
+AppServiceManager appServiceClient = AppServiceManager.authenticate(credentials, SUBSCRIPTION_ID);
+```
+
+Then, create a Web App instance using this `appServiceClient`.
+
+```java
+WebApp webApp = appServiceClient.webApps()
+    .define(appName)
+    .withRegion(Region.US_WEST)
+    .withNewResourceGroup(rgName)
+    .withNewWindowsPlan(PricingTier.STANDARD_S1)
+    .create();
+```
+
 ## Download
 
 ### Latest stable release
 
-If you are using released builds from 1.29.0, add the following to your POM file:
+If you are using released builds from 1.35.1, add the following to your POM file:
 
 ```xml
 <dependency>
     <groupId>com.microsoft.azure</groupId>
     <artifactId>azure</artifactId>
-    <version>1.29.0</version>
+    <version>1.35.1</version>
 </dependency>
 ```
 
@@ -640,7 +691,7 @@ If you are using snapshots builds for this repo, add the following repository an
 <dependency>
     <groupId>com.microsoft.azure</groupId>
     <artifactId>azure</artifactId>
-    <version>1.29.1-SNAPSHOT</version>
+    <version>1.35.2-SNAPSHOT</version>
 </dependency>
 <dependency>
     <groupId>com.microsoft.azure</groupId>
@@ -667,7 +718,7 @@ If you are using snapshots builds for this repo, add the following repository an
 
 ## Upgrading from older versions
 
-If you are migrating your code from 1.28.0 to 1.29.0, you can use these release notes for [preparing your code for 1.29.0 from 1.28.0](./notes/prepare-for-1.29.0.md).
+If you are migrating your code from 1.35.0 to 1.35.1, you can use these release notes for [preparing your code for 1.35.1 from 1.35.0](./notes/prepare-for-1.35.1.md).
 
 In general, Azure Libraries for Java follow [semantic versioning](http://semver.org/), so user code should continue working in a compatible fashion between minor versions of the same major version release train, with the following caveats:
 
@@ -676,7 +727,6 @@ In general, Azure Libraries for Java follow [semantic versioning](http://semver.
 * occasionally the naming and structure of "fluent" interface definitions (i.e. the ones whose names start with `With*`) may change between minor versions, as long as that change does not affect the fluent "flow" (the chaining of the methods in a definition or update chain).
 
 * the `*Inner` types and their methods may occasionally change their naming and structure between minor versions in breaking ways. User code should generally avoid making a reference to those types though, unless their functionality is not yet exposed by the "fluent" API.
-
 
 ## Help and Issues
 
@@ -701,6 +751,16 @@ If you would like to become an active contributor to this project please follow 
 
 | Version           | SHA1                                                                                      | Remarks                                               |
 |-------------------|-------------------------------------------------------------------------------------------|-------------------------------------------------------|
+| 1.35.1       | [1.35.1](https://github.com/Azure/azure-libraries-for-java/tree/v1.35.1)               | Tagged release for 1.35.1 version of Azure management libraries |
+| 1.35.0       | [1.35.0](https://github.com/Azure/azure-libraries-for-java/tree/v1.35.0)               | Tagged release for 1.35.0 version of Azure management libraries |
+| 1.34.0       | [1.34.0](https://github.com/Azure/azure-libraries-for-java/tree/v1.34.0)               | Tagged release for 1.34.0 version of Azure management libraries |
+| 1.33.1       | [1.33.1](https://github.com/Azure/azure-libraries-for-java/tree/v1.33.1)               | Tagged release for 1.33.1 version of Azure management libraries |
+| 1.33.0       | [1.33.0](https://github.com/Azure/azure-libraries-for-java/tree/v1.33.0)               | Tagged release for 1.33.0 version of Azure management libraries |
+| 1.32.1       | [1.32.1](https://github.com/Azure/azure-libraries-for-java/tree/v1.32.1)               | Tagged release for 1.32.1 version of Azure management libraries |
+| 1.32.0       | [1.32.0](https://github.com/Azure/azure-libraries-for-java/tree/v1.32.0)               | Tagged release for 1.32.0 version of Azure management libraries |
+| 1.31.1       | [1.31.1](https://github.com/Azure/azure-libraries-for-java/tree/v1.31.1)               | Tagged release for 1.31.1 version of Azure management libraries |
+| 1.31.0       | [1.31.0](https://github.com/Azure/azure-libraries-for-java/tree/v1.31.0)               | Tagged release for 1.31.0 version of Azure management libraries |
+| 1.30.0       | [1.30.0](https://github.com/Azure/azure-libraries-for-java/tree/v1.30.0)               | Tagged release for 1.30.0 version of Azure management libraries |
 | 1.29.0       | [1.29.0](https://github.com/Azure/azure-libraries-for-java/tree/v1.29.0)               | Tagged release for 1.29.0 version of Azure management libraries |
 | 1.28.0       | [1.28.0](https://github.com/Azure/azure-libraries-for-java/tree/v1.28.0)               | Tagged release for 1.28.0 version of Azure management libraries |
 | 1.27.2       | [1.27.2](https://github.com/Azure/azure-libraries-for-java/tree/v1.27.2)               | Tagged release for 1.27.2 version of Azure management libraries |

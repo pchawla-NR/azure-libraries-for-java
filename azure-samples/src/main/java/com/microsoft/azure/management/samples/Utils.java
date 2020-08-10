@@ -1012,7 +1012,7 @@ public final class Utils {
      */
     public static void print(WebAppBase resource) {
         StringBuilder builder = new StringBuilder().append("Web app: ").append(resource.id())
-                .append("Name: ").append(resource.name())
+                .append("\n\tName: ").append(resource.name())
                 .append("\n\tState: ").append(resource.state())
                 .append("\n\tResource group: ").append(resource.resourceGroupName())
                 .append("\n\tRegion: ").append(resource.region())
@@ -1395,6 +1395,7 @@ public final class Utils {
      */
     public static void createCertificate(String certPath, String pfxPath,
                                          String alias, String password, String cnName) throws Exception {
+        SdkContext.prepareFileLocation(new File(pfxPath), new File(certPath));
         if (new File(pfxPath).exists()) {
             return;
         }
@@ -1419,7 +1420,7 @@ public final class Utils {
                 "-keystore", pfxPath, "-storepass", password, "-validity",
                 validityInDays, "-keyalg", keyAlg, "-sigalg", sigAlg, "-keysize", keySize,
                 "-storetype", storeType, "-dname", "CN=" + cnName, "-ext", "EKU=1.3.6.1.5.5.7.3.1"};
-        Utils.cmdInvocation(commandArgs, false);
+        Utils.cmdInvocation(commandArgs, true);
 
         // Create cer file i.e. extract public key from pfx
         File pfxFile = new File(pfxPath);
