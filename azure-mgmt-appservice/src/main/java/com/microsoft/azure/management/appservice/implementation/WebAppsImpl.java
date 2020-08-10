@@ -17,6 +17,10 @@ import rx.functions.Func1;
 import rx.functions.Func2;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * The implementation for WebApps.
@@ -31,6 +35,14 @@ class WebAppsImpl
                     AppServiceManager>
         implements WebApps {
 
+    private final static Set<String> SUPPORTED_KINDS;
+
+    static {
+        SUPPORTED_KINDS = new HashSet<>();
+        SUPPORTED_KINDS.add("app");
+        SUPPORTED_KINDS.add("api");
+    }
+
     private final PagedListConverter<SiteInner, WebApp> converter;
 
     // The default implementation is requesting extra properties that need specific permissions.
@@ -43,7 +55,8 @@ class WebAppsImpl
         converter = new PagedListConverter<SiteInner, WebApp>() {
             @Override
             protected boolean filter(SiteInner inner) {
-                return inner.kind() == null || Arrays.asList(inner.kind().split(",")).contains("app");
+                return inner.kind() == null ||
+                        !Collections.disjoint(Arrays.asList(inner.kind().split(",")), SUPPORTED_KINDS);
             }
 
             @Override
@@ -68,7 +81,8 @@ class WebAppsImpl
 
             @Override
             protected boolean filter(SiteInner inner) {
-                return inner.kind() != null && Arrays.asList(inner.kind().split(",")).contains("app");
+                return inner.kind() != null &&
+                        !Collections.disjoint(Arrays.asList(inner.kind().split(",")), SUPPORTED_KINDS);
             }
         };
     }
