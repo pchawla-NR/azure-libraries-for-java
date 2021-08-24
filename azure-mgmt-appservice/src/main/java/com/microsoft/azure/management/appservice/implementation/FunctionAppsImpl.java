@@ -35,6 +35,11 @@ class FunctionAppsImpl
 
     private final PagedListConverter<SiteInner, FunctionApp> converter;
 
+    // The default implementation is requesting extra properties that need specific permissions.
+    // This converter is only used when listing functionApps but ignoring the extra calls to the
+    // API for getting those properties
+    private final PagedListConverter<SiteInner, FunctionApp> converterWithoutProperties;
+
     FunctionAppsImpl(final AppServiceManager manager) {
         super(manager.inner().webApps(), manager);
         converter = new PagedListConverter<SiteInner, FunctionApp>() {
@@ -49,6 +54,18 @@ class FunctionAppsImpl
                                 return wrapModel(siteInner, siteConfigResourceInner, logsConfigInner);
                             }
                         });
+            }
+
+            @Override
+            protected boolean filter(SiteInner inner) {
+                return inner.kind() != null && Arrays.asList(inner.kind().split(",")).contains("functionapp");
+            }
+        };
+
+        converterWithoutProperties = new PagedListConverter<SiteInner, FunctionApp>() {
+            @Override
+            public Observable<FunctionApp> typeConvertAsync(final SiteInner siteInner) {
+                return Observable.just((FunctionApp) wrapModel(siteInner));
             }
 
             @Override
@@ -129,7 +146,6 @@ class FunctionAppsImpl
         return converter.convert(pagedList);
     }
 
-
     @Override
     public FunctionAppImpl define(String name) {
         return wrapModel(name);
@@ -138,5 +154,10 @@ class FunctionAppsImpl
     @Override
     public Completable deleteByResourceGroupAsync(String groupName, String name) {
         return this.inner().deleteAsync(groupName, name).toCompletable();
+    }
+
+    @Override
+    public PagedList<FunctionApp> listWithoutProperties() {
+        return converterWithoutProperties.convert(inner().list());
     }
 }

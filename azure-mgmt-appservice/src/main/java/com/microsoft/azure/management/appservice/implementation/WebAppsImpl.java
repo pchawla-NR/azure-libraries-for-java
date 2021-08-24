@@ -17,6 +17,10 @@ import rx.functions.Func1;
 import rx.functions.Func2;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * The implementation for WebApps.
@@ -31,14 +35,28 @@ class WebAppsImpl
                     AppServiceManager>
         implements WebApps {
 
+    private final static Set<String> SUPPORTED_KINDS;
+
+    static {
+        SUPPORTED_KINDS = new HashSet<>();
+        SUPPORTED_KINDS.add("app");
+        SUPPORTED_KINDS.add("api");
+    }
+
     private final PagedListConverter<SiteInner, WebApp> converter;
+
+    // The default implementation is requesting extra properties that need specific permissions.
+    // This converter is only used when listing webApps but ignoring the extra calls to the
+    // API for getting those properties
+    private final PagedListConverter<SiteInner, WebApp> converterWithoutProperties;
 
     WebAppsImpl(final AppServiceManager manager) {
         super(manager.inner().webApps(), manager);
         converter = new PagedListConverter<SiteInner, WebApp>() {
             @Override
             protected boolean filter(SiteInner inner) {
-                return inner.kind() == null || Arrays.asList(inner.kind().split(",")).contains("app");
+                return inner.kind() == null ||
+                        !Collections.disjoint(Arrays.asList(inner.kind().split(",")), SUPPORTED_KINDS);
             }
 
             @Override
@@ -52,6 +70,19 @@ class WebAppsImpl
                                 return wrapModel(siteInner, siteConfigResourceInner, logsConfigInner);
                             }
                         });
+            }
+        };
+
+        converterWithoutProperties = new PagedListConverter<SiteInner, WebApp>() {
+            @Override
+            public Observable<WebApp> typeConvertAsync(final SiteInner siteInner) {
+                return Observable.just((WebApp) wrapModel(siteInner));
+            }
+
+            @Override
+            protected boolean filter(SiteInner inner) {
+                return inner.kind() != null &&
+                        !Collections.disjoint(Arrays.asList(inner.kind().split(",")), SUPPORTED_KINDS);
             }
         };
     }
@@ -100,9 +131,13 @@ class WebAppsImpl
         return converter.convert(pagedList);
     }
 
-
     @Override
     public WebAppImpl define(String name) {
         return wrapModel(name);
+    }
+
+    @Override
+    public PagedList<WebApp> listWithoutProperties() {
+        return converterWithoutProperties.convert(inner().list());
     }
 }

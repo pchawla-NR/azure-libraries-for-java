@@ -14,6 +14,7 @@ import com.microsoft.azure.credentials.ApplicationTokenCredentials;
 import com.microsoft.azure.credentials.AzureTokenCredentials;
 import com.microsoft.azure.management.apigeneration.Beta;
 import com.microsoft.azure.management.apigeneration.Beta.SinceVersion;
+import com.microsoft.azure.management.appservice.FunctionApps;
 import com.microsoft.azure.management.appservice.WebApps;
 import com.microsoft.azure.management.appservice.implementation.AppServiceManager;
 import com.microsoft.azure.management.batch.BatchAccounts;
@@ -135,7 +136,7 @@ import java.io.IOException;
  *
  * A new set of management libraries are now Generally Available. For documentation on how to use the new libraries, please @see <a href="https://aka.ms/azsdk/java/mgmt">the new libraries for Azure resource management</a>.
  */
-public final class Azure {
+public final class Azure implements AzureInterface {
     private final ResourceManager resourceManager;
     private final StorageManager storageManager;
     private final ComputeManager computeManager;
@@ -446,6 +447,7 @@ public final class Azure {
     /**
      * @return the currently selected subscription ID this client is authenticated to work with
      */
+    @Override
     public String subscriptionId() {
         return this.subscriptionId;
     }
@@ -460,6 +462,7 @@ public final class Azure {
     /**
      * @return the currently selected subscription this client is authenticated to work with
      */
+    @Override
     public Subscription getCurrentSubscription() {
         return this.subscriptions().getById(this.subscriptionId());
     }
@@ -467,6 +470,7 @@ public final class Azure {
     /**
      * @return entry point to managing subscriptions
      */
+    @Override
     public Subscriptions subscriptions() {
         return this.resourceManager.subscriptions();
     }
@@ -481,6 +485,7 @@ public final class Azure {
     /**
      * @return entry point to managing resource groups
      */
+    @Override
     public ResourceGroups resourceGroups() {
         return this.resourceManager.resourceGroups();
     }
@@ -488,6 +493,7 @@ public final class Azure {
     /**
      * @return entry point to managing deployments
      */
+    @Override
     public Deployments deployments() {
         return this.resourceManager.deployments();
     }
@@ -495,6 +501,7 @@ public final class Azure {
     /**
      * @return entry point to managing generic resources
      */
+    @Override
     public GenericResources genericResources() {
         return resourceManager.genericResources();
     }
@@ -509,6 +516,7 @@ public final class Azure {
     /**
      * @return entry point to managing features
      */
+    @Override
     public Features features() {
         return resourceManager.features();
     }
@@ -516,6 +524,7 @@ public final class Azure {
     /**
      * @return entry point to managing resource providers
      */
+    @Override
     public Providers providers() {
         return resourceManager.providers();
     }
@@ -523,6 +532,7 @@ public final class Azure {
     /**
      * @return entry point to managing policy definitions.
      */
+    @Override
     public PolicyDefinitions policyDefinitions() {
         return resourceManager.policyDefinitions();
     }
@@ -530,6 +540,7 @@ public final class Azure {
     /**
      * @return entry point to managing policy assignments.
      */
+    @Override
     public PolicyAssignments policyAssignments() {
         return resourceManager.policyAssignments();
     }
@@ -537,6 +548,7 @@ public final class Azure {
     /**
      * @return entry point to managing storage accounts
      */
+    @Override
     public StorageAccounts storageAccounts() {
         return storageManager.storageAccounts();
     }
@@ -544,6 +556,7 @@ public final class Azure {
     /**
      * @return entry point to managing storage account usages
      */
+    @Override
     public Usages storageUsages() {
         return storageManager.usages();
     }
@@ -558,6 +571,7 @@ public final class Azure {
     /**
      * @return entry point to managing availability sets
      */
+    @Override
     public AvailabilitySets availabilitySets() {
         return computeManager.availabilitySets();
     }
@@ -565,6 +579,7 @@ public final class Azure {
     /**
      * @return entry point to managing virtual networks
      */
+    @Override
     public Networks networks() {
         return networkManager.networks();
     }
@@ -572,6 +587,7 @@ public final class Azure {
     /**
      * @return entry point to managing route tables
      */
+    @Override
     public RouteTables routeTables() {
         return networkManager.routeTables();
     }
@@ -579,6 +595,7 @@ public final class Azure {
     /**
      * @return entry point to managing load balancers
      */
+    @Override
     public LoadBalancers loadBalancers() {
         return networkManager.loadBalancers();
     }
@@ -586,6 +603,7 @@ public final class Azure {
     /**
      * @return entry point to managing application gateways
      */
+    @Override
     public ApplicationGateways applicationGateways() {
         return networkManager.applicationGateways();
     }
@@ -593,6 +611,7 @@ public final class Azure {
     /**
      * @return entry point to managing network security groups
      */
+    @Override
     public NetworkSecurityGroups networkSecurityGroups() {
         return networkManager.networkSecurityGroups();
     }
@@ -600,6 +619,7 @@ public final class Azure {
     /**
      * @return entry point to managing network resource usages
      */
+    @Override
     public NetworkUsages networkUsages() {
         return networkManager.usages();
     }
@@ -607,6 +627,7 @@ public final class Azure {
     /**
      * @return entry point to managing network watchers
      */
+    @Override
     public NetworkWatchers networkWatchers() {
         return networkManager.networkWatchers();
     }
@@ -614,6 +635,7 @@ public final class Azure {
     /**
      * @return entry point to managing virtual network gateways
      */
+    @Override
     public VirtualNetworkGateways virtualNetworkGateways() {
         return networkManager.virtualNetworkGateways();
     }
@@ -621,6 +643,7 @@ public final class Azure {
     /**
      * @return entry point to managing local network gateways
      */
+    @Override
     public LocalNetworkGateways localNetworkGateways() {
         return networkManager.localNetworkGateways();
     }
@@ -668,6 +691,7 @@ public final class Azure {
     /**
      * @return entry point to managing virtual machines
      */
+    @Override
     public VirtualMachines virtualMachines() {
         return computeManager.virtualMachines();
     }
@@ -675,6 +699,7 @@ public final class Azure {
     /**
      * @return entry point to managing virtual machine scale sets.
      */
+    @Override
     public VirtualMachineScaleSets virtualMachineScaleSets() {
         return computeManager.virtualMachineScaleSets();
     }
@@ -682,6 +707,7 @@ public final class Azure {
     /**
      * @return entry point to managing virtual machine images
      */
+    @Override
     public VirtualMachineImages virtualMachineImages() {
         return computeManager.virtualMachineImages();
     }
@@ -689,6 +715,7 @@ public final class Azure {
     /**
      * @return entry point to managing virtual machine custom images
      */
+    @Override
     public VirtualMachineCustomImages virtualMachineCustomImages() {
         return computeManager.virtualMachineCustomImages();
     }
@@ -696,6 +723,7 @@ public final class Azure {
     /**
      * @return entry point to managing managed disks
      */
+    @Override
     public Disks disks() {
         return computeManager.disks();
     }
@@ -703,6 +731,7 @@ public final class Azure {
     /**
      * @return entry point to managing managed snapshots
      */
+    @Override
     public Snapshots snapshots() {
         return computeManager.snapshots();
     }
@@ -717,6 +746,7 @@ public final class Azure {
     /**
      * @return entry point to managing public IP addresses
      */
+    @Override
     public PublicIPAddresses publicIPAddresses() {
         return this.networkManager.publicIPAddresses();
     }
@@ -731,6 +761,7 @@ public final class Azure {
     /**
      * @return entry point to managing network interfaces
      */
+    @Override
     public NetworkInterfaces networkInterfaces() {
         return this.networkManager.networkInterfaces();
     }
@@ -738,6 +769,7 @@ public final class Azure {
     /**
      * @return entry point to managing compute resource usages
      */
+    @Override
     public ComputeUsages computeUsages() {
         return computeManager.usages();
     }
@@ -745,6 +777,7 @@ public final class Azure {
     /**
      * @return entry point to managing key vaults
      */
+    @Override
     public Vaults vaults() {
         return this.keyVaultManager.vaults();
     }
@@ -752,6 +785,7 @@ public final class Azure {
     /**
      * @return entry point to managing batch accounts.
      */
+    @Override
     public BatchAccounts batchAccounts() {
         return batchManager.batchAccounts();
     }
@@ -775,6 +809,7 @@ public final class Azure {
     /**
      * @return entry point to managing traffic manager profiles.
      */
+    @Override
     public TrafficManagerProfiles trafficManagerProfiles() {
         return trafficManager.profiles();
     }
@@ -782,6 +817,7 @@ public final class Azure {
     /**
      * @return entry point to managing Redis Caches.
      */
+    @Override
     public RedisCaches redisCaches() {
         return redisManager.redisCaches();
     }
@@ -789,6 +825,7 @@ public final class Azure {
     /**
      * @return entry point to managing cdn manager profiles.
      */
+    @Override
     public CdnProfiles cdnProfiles() {
         return cdnManager.profiles();
     }
@@ -796,6 +833,7 @@ public final class Azure {
     /**
      * @return entry point to managing DNS zones.
      */
+    @Override
     public DnsZones dnsZones() {
         return dnsZoneManager.zones();
     }
@@ -803,9 +841,19 @@ public final class Azure {
     /**
      * @return entry point to managing web apps.
      */
+    @Override
     @Beta
     public WebApps webApps() {
         return appServiceManager.webApps();
+    }
+
+    /**
+     * @return entry point to managing function apps.
+     */
+    @Override
+    @Beta
+    public FunctionApps functionApps() {
+        return appServiceManager.functionApps();
     }
 
     /**
@@ -819,6 +867,7 @@ public final class Azure {
     /**
      * @return entry point to managing Sql server.
      */
+    @Override
     public SqlServers sqlServers() {
         return sqlServerManager.sqlServers();
     }
@@ -826,6 +875,7 @@ public final class Azure {
     /**
      * @return entry point to managing Service Bus.
      */
+    @Override
     @Beta
     public ServiceBusNamespaces serviceBusNamespaces() {
         return serviceBusManager.namespaces();
@@ -843,6 +893,7 @@ public final class Azure {
     /**
      * @return entry point to managing Container Services.
      */
+    @Override
     @Beta(SinceVersion.V1_4_0)
     public ContainerServices containerServices() {
         return containerServiceManager.containerServices();
@@ -851,6 +902,7 @@ public final class Azure {
     /**
      * @return entry point to managing Kubernetes clusters.
      */
+    @Override
     @Beta(SinceVersion.V1_4_0)
     public KubernetesClusters kubernetesClusters() {
         return containerServiceManager.kubernetesClusters();
@@ -859,6 +911,7 @@ public final class Azure {
     /**
      * @return entry point to managing Azure Container Instances.
      */
+    @Override
     @Beta(SinceVersion.V1_3_0)
     public ContainerGroups containerGroups() {
         return containerInstanceManager.containerGroups();
@@ -867,6 +920,7 @@ public final class Azure {
     /**
      * @return entry point to managing Container Registries.
      */
+    @Override
     @Beta(SinceVersion.V1_1_0)
     public Registries containerRegistries() {
         return containerRegistryManager.containerRegistries();
@@ -891,6 +945,7 @@ public final class Azure {
     /**
      * @return entry point to managing Container Regsitries.
      */
+    @Override
     @Beta(SinceVersion.V1_2_0)
     public CosmosDBAccounts cosmosDBAccounts() {
         return cosmosDBManager.databaseAccounts();
@@ -899,6 +954,7 @@ public final class Azure {
     /**
      * @return entry point to managing Search services.
      */
+    @Override
     @Beta(SinceVersion.V1_2_0)
     public SearchServices searchServices() {
         return searchServiceManager.searchServices();
@@ -915,6 +971,7 @@ public final class Azure {
     /**
      * @return entry point to authentication and authorization management in Azure
      */
+    @Override
     @Beta(SinceVersion.V1_2_0)
     public AccessManagement accessManagement() {
         return this.authenticated;
