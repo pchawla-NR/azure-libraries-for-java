@@ -923,6 +923,10 @@ abstract class WebAppBaseImpl<
 
     Observable<SiteInner> submitSite(final SiteInner site) {
         site.withSiteConfig(new SiteConfig());
+        return submitSiteWithoutSiteConfig(site);
+    }
+
+    Observable<SiteInner> submitSiteWithoutSiteConfig(final SiteInner site) {
         // Construct web app observable
         return createOrUpdateInner(site)
                 .map(new Func1<SiteInner, SiteInner>() {
@@ -1779,6 +1783,14 @@ abstract class WebAppBaseImpl<
     @Override
     public WebAppDiagnosticLogsImpl<FluentT, FluentImplT> updateDiagnosticLogsConfiguration() {
         return defineDiagnosticLogsConfiguration();
+    }
+
+    public Map<String, String> getSiteAppSettings() {
+        return getSiteAppSettingsAsync().toBlocking().single();
+    }
+
+    public Observable<Map<String, String>> getSiteAppSettingsAsync() {
+        return kuduClient.settings();
     }
 
     private static class PipedInputStreamWithCallback extends PipedInputStream {

@@ -1,7 +1,7 @@
 {
   "networkCallRecords" : [ {
     "Method" : "PUT",
-    "Uri" : "http://localhost:1234/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/rgsb01_a1d23841f524?api-version=2019-08-01",
+    "Uri" : "http://localhost:1234/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/rgsb01_a1d23841f524?api-version=2020-06-01",
     "Headers" : {
       "User-Agent" : "Azure-SDK-For-Java/null OS:Windows 10/10.0 MacAddressHash:d3fc60ad002f4c863d99d3beb851e8edf973a5248d395e580e9f144e262d969c Java:1.8.0_221 (ResourceManagementClient, 2019-08-01)",
       "Content-Type" : "application/json; charset=utf-8"
@@ -437,7 +437,7 @@
       "content-type" : "application/json; charset=utf-8",
       "cache-control" : "no-cache",
       "x-ms-request-id" : "662d7b71-9a51-4edf-b884-e72023c3a0bb_M3CH3_M3CH3",
-      "Body" : "{\"primaryConnectionString\":\"Endpoint=sb://namespace66415624f.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=oqmjUy2rDMfTzLGzshqKeVK0+K2cP46vGje+e9iE15g=\",\"secondaryConnectionString\":\"Endpoint=sb://namespace66415624f.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=dM7w4CQMvUXRD4gTrx+RJYNpa4BJURL+pdZPW95QhFQ=\",\"primaryKey\":\"oqmjUy2rDMfTzLGzshqKeVK0+K2cP46vGje+e9iE15g=\",\"secondaryKey\":\"dM7w4CQMvUXRD4gTrx+RJYNpa4BJURL+pdZPW95QhFQ=\",\"keyName\":\"RootManageSharedAccessKey\"}"
+      "Body" : "{\"primaryConnectionString\":\"Endpoint=sb://namespace66415624f.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=MGMT_PLACEHOLDER\",\"secondaryConnectionString\":\"Endpoint=sb://namespace66415624f.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=MGMT_PLACEHOLDER\",\"primaryKey\":\"MGMT_PLACEHOLDER\",\"secondaryKey\":\"MGMT_PLACEHOLDER\",\"keyName\":\"RootManageSharedAccessKey\"}"
     }
   }, {
     "Method" : "POST",
@@ -465,7 +465,7 @@
       "content-type" : "application/json; charset=utf-8",
       "cache-control" : "no-cache",
       "x-ms-request-id" : "047de933-15c4-461c-88df-0aaa43eb2e55_M3CH3_M3CH3",
-      "Body" : "{\"primaryConnectionString\":\"Endpoint=sb://namespace66415624f.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=oqmjUy2rDMfTzLGzshqKeVK0+K2cP46vGje+e9iE15g=\",\"secondaryConnectionString\":\"Endpoint=sb://namespace66415624f.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=MyeY8+gcsykpDcstI8JjlVtXhGQ4ekhVZVtQf8pNryU=\",\"primaryKey\":\"oqmjUy2rDMfTzLGzshqKeVK0+K2cP46vGje+e9iE15g=\",\"secondaryKey\":\"MyeY8+gcsykpDcstI8JjlVtXhGQ4ekhVZVtQf8pNryU=\",\"keyName\":\"RootManageSharedAccessKey\"}"
+      "Body" : "{\"primaryConnectionString\":\"Endpoint=sb://namespace66415624f.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=MGMT_PLACEHOLDER\",\"secondaryConnectionString\":\"Endpoint=sb://namespace66415624f.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=MGMT_PLACEHOLDER\",\"primaryKey\":\"MGMT_PLACEHOLDER\",\"secondaryKey\":\"MGMT_PLACEHOLDER\",\"keyName\":\"RootManageSharedAccessKey\"}"
     }
   }, {
     "Method" : "DELETE",
@@ -569,7 +569,7 @@
     }
   }, {
     "Method" : "DELETE",
-    "Uri" : "http://localhost:1234/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/rgsb01_a1d23841f524?api-version=2019-08-01",
+    "Uri" : "http://localhost:1234/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/rgsb01_a1d23841f524?api-version=2020-06-01",
     "Headers" : {
       "User-Agent" : "Azure-SDK-For-Java/null OS:Windows 10/10.0 MacAddressHash:d3fc60ad002f4c863d99d3beb851e8edf973a5248d395e580e9f144e262d969c Java:1.8.0_221 (ResourceManagementClient, 2019-08-01)",
       "Content-Type" : "application/json; charset=utf-8"

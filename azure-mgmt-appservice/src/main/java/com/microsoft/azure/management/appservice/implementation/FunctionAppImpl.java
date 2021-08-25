@@ -25,7 +25,6 @@ import com.microsoft.azure.management.resources.fluentcore.utils.SdkContext;
 import com.microsoft.azure.management.storage.StorageAccount;
 import com.microsoft.azure.management.storage.StorageAccountKey;
 import com.microsoft.azure.management.storage.StorageAccountSkuType;
-import com.microsoft.rest.LogLevel;
 import com.microsoft.rest.credentials.TokenCredentials;
 import okhttp3.HttpUrl;
 import okhttp3.Request;
@@ -41,6 +40,7 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 import rx.Completable;
 import rx.Observable;
+import rx.exceptions.Exceptions;
 import rx.functions.Action0;
 import rx.functions.Func1;
 import rx.functions.Func2;
@@ -104,12 +104,10 @@ class FunctionAppImpl
             functionService = manager().restClient().newBuilder()
                     .withBaseUrl(defaultHostName.toString())
                     .withCredentials(new FunctionCredentials(this))
-                    .withLogLevel(LogLevel.BODY_AND_HEADERS)
                     .build()
                     .retrofit().create(FunctionService.class);
             functionServiceViaKey = manager().restClient().newBuilder()
                     .withBaseUrl(defaultHostName.toString())
-                    .withLogLevel(LogLevel.BODY_AND_HEADERS)
                     .build()
                     .retrofit().create(FunctionServiceViaKey.class);
         }
@@ -282,11 +280,11 @@ class FunctionAppImpl
             .withRegion(regionName());
         if (super.creatableGroup != null && isInCreateMode()) {
             storageAccountCreatable = storageDefine.withNewResourceGroup(super.creatableGroup)
-                .withGeneralPurposeAccountKind()
+                .withGeneralPurposeAccountKindV2()
                 .withSku(sku);
         } else {
             storageAccountCreatable = storageDefine.withExistingResourceGroup(resourceGroupName())
-                .withGeneralPurposeAccountKind()
+                .withGeneralPurposeAccountKindV2()
                 .withSku(sku);
         }
         this.addDependency(storageAccountCreatable);
@@ -300,11 +298,11 @@ class FunctionAppImpl
                 .withRegion(regionName());
         if (super.creatableGroup != null && isInCreateMode()) {
             storageAccountCreatable = storageDefine.withNewResourceGroup(super.creatableGroup)
-                    .withGeneralPurposeAccountKind()
+                    .withGeneralPurposeAccountKindV2()
                     .withSku(sku);
         } else {
             storageAccountCreatable = storageDefine.withExistingResourceGroup(resourceGroupName())
-                    .withGeneralPurposeAccountKind()
+                    .withGeneralPurposeAccountKindV2()
                     .withSku(sku);
         }
         this.addDependency(storageAccountCreatable);
@@ -614,7 +612,17 @@ class FunctionAppImpl
     @Override
     public Completable zipDeployAsync(File zipFile) {
         try {
-            return zipDeployAsync(new FileInputStream(zipFile));
+            final InputStream is = new FileInputStream(zipFile);
+            return zipDeployAsync(new FileInputStream(zipFile)).doAfterTerminate(new Action0() {
+                @Override
+                public void call() {
+                    try {
+                        is.close();
+                    } catch (IOException e) {
+                        Exceptions.propagate(e);
+                    }
+                }
+            });
         } catch (IOException e) {
             return Completable.error(e);
         }
@@ -642,7 +650,7 @@ class FunctionAppImpl
                 withNewConsumptionPlan();
             }
             if (currentStorageAccount == null && storageAccountToSet == null && storageAccountCreatable == null) {
-                withNewStorageAccount(SdkContext.randomResourceName(name(), 20), com.microsoft.azure.management.storage.SkuName.STANDARD_GRS);
+                withNewStorageAccount(SdkContext.randomResourceName(getStorageAccountName(), 20), StorageAccountSkuType.STANDARD_LRS);
             }
         }
         return super.createAsync();
@@ -654,6 +662,10 @@ class FunctionAppImpl
             initializeFunctionService();
         }
         return super.afterPostRunAsync(isGroupFaulted);
+    }
+
+    private String getStorageAccountName() {
+        return name().replaceAll("[^a-zA-Z0-9]", "");
     }
 
     private static class ListKeysResult {

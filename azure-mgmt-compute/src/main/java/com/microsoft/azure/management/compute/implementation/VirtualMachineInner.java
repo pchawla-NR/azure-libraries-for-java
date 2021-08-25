@@ -14,6 +14,7 @@ import com.microsoft.azure.management.compute.StorageProfile;
 import com.microsoft.azure.management.compute.AdditionalCapabilities;
 import com.microsoft.azure.management.compute.OSProfile;
 import com.microsoft.azure.management.compute.NetworkProfile;
+import com.microsoft.azure.management.compute.SecurityProfile;
 import com.microsoft.azure.management.compute.DiagnosticsProfile;
 import com.microsoft.azure.SubResource;
 import com.microsoft.azure.management.compute.VirtualMachinePriorityTypes;
@@ -21,6 +22,7 @@ import com.microsoft.azure.management.compute.VirtualMachineEvictionPolicyTypes;
 import com.microsoft.azure.management.compute.BillingProfile;
 import java.util.List;
 import com.microsoft.azure.management.compute.VirtualMachineIdentity;
+import com.microsoft.azure.management.compute.ExtendedLocation;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microsoft.rest.serializer.JsonFlatten;
 import com.microsoft.azure.Resource;
@@ -73,6 +75,12 @@ public class VirtualMachineInner extends Resource {
      */
     @JsonProperty(value = "properties.networkProfile")
     private NetworkProfile networkProfile;
+
+    /**
+     * Specifies the Security related profile settings for the virtual machine.
+     */
+    @JsonProperty(value = "properties.securityProfile")
+    private SecurityProfile securityProfile;
 
     /**
      * Specifies the boot diagnostic settings state.
@@ -157,6 +165,15 @@ public class VirtualMachineInner extends Resource {
     private SubResource host;
 
     /**
+     * Specifies information about the dedicated host group that the virtual
+     * machine resides in. &lt;br&gt;&lt;br&gt;Minimum api-version: 2020-06-01.
+     * &lt;br&gt;&lt;br&gt;NOTE: User cannot specify both host and hostGroup
+     * properties.
+     */
+    @JsonProperty(value = "properties.hostGroup")
+    private SubResource hostGroup;
+
+    /**
      * The provisioning state, which only appears in the response.
      */
     @JsonProperty(value = "properties.provisioningState", access = JsonProperty.Access.WRITE_ONLY)
@@ -170,14 +187,16 @@ public class VirtualMachineInner extends Resource {
 
     /**
      * Specifies that the image or disk that is being used was licensed
-     * on-premises. This element is only used for images that contain the
-     * Windows Server operating system. &lt;br&gt;&lt;br&gt; Possible values
-     * are: &lt;br&gt;&lt;br&gt; Windows_Client &lt;br&gt;&lt;br&gt;
-     * Windows_Server &lt;br&gt;&lt;br&gt; If this element is included in a
-     * request for an update, the value must match the initial value. This
-     * value cannot be updated. &lt;br&gt;&lt;br&gt; For more information, see
-     * [Azure Hybrid Use Benefit for Windows
-     * Server](https://docs.microsoft.com/azure/virtual-machines/virtual-machines-windows-hybrid-use-benefit-licensing?toc=%2fazure%2fvirtual-machines%2fwindows%2ftoc.json)
+     * on-premises. &lt;br&gt;&lt;br&gt; Possible values for Windows Server
+     * operating system are: &lt;br&gt;&lt;br&gt; Windows_Client
+     * &lt;br&gt;&lt;br&gt; Windows_Server &lt;br&gt;&lt;br&gt; Possible values
+     * for Linux Server operating system are: &lt;br&gt;&lt;br&gt; RHEL_BYOS
+     * (for RHEL) &lt;br&gt;&lt;br&gt; SLES_BYOS (for SUSE)
+     * &lt;br&gt;&lt;br&gt; For more information, see [Azure Hybrid Use Benefit
+     * for Windows
+     * Server](https://docs.microsoft.com/azure/virtual-machines/windows/hybrid-use-benefit-licensing)
+     * &lt;br&gt;&lt;br&gt; [Azure Hybrid Use Benefit for Linux
+     * Server](https://docs.microsoft.com/azure/virtual-machines/linux/azure-hybrid-benefit-linux)
      * &lt;br&gt;&lt;br&gt; Minimum api-version: 2015-06-15.
      */
     @JsonProperty(value = "properties.licenseType")
@@ -190,6 +209,30 @@ public class VirtualMachineInner extends Resource {
      */
     @JsonProperty(value = "properties.vmId", access = JsonProperty.Access.WRITE_ONLY)
     private String vmId;
+
+    /**
+     * Specifies the time alloted for all extensions to start. The time
+     * duration should be between 15 minutes and 120 minutes (inclusive) and
+     * should be specified in ISO 8601 format. The default value is 90 minutes
+     * (PT1H30M). &lt;br&gt;&lt;br&gt; Minimum api-version: 2020-06-01.
+     */
+    @JsonProperty(value = "properties.extensionsTimeBudget")
+    private String extensionsTimeBudget;
+
+    /**
+     * Specifies the scale set logical fault domain into which the Virtual
+     * Machine will be created. By default, the Virtual Machine will by
+     * automatically assigned to a fault domain that best maintains balance
+     * across available fault domains.&lt;br&gt;&lt;li&gt;This is applicable
+     * only if the 'virtualMachineScaleSet' property of this Virtual Machine is
+     * set.&lt;li&gt;The Virtual Machine Scale Set that is referenced, must
+     * have 'platformFaultDomainCount' &amp;gt; 1.&lt;li&gt;This property
+     * cannot be updated once the Virtual Machine is created.&lt;li&gt;Fault
+     * domain assignment can be viewed in the Virtual Machine Instance
+     * View.&lt;br&gt;&lt;br&gt;Minimum api‐version: 2020‐12‐01.
+     */
+    @JsonProperty(value = "properties.platformFaultDomain")
+    private Integer platformFaultDomain;
 
     /**
      * The virtual machine child extension resources.
@@ -208,6 +251,12 @@ public class VirtualMachineInner extends Resource {
      */
     @JsonProperty(value = "zones")
     private List<String> zones;
+
+    /**
+     * The extended location of the Virtual Machine.
+     */
+    @JsonProperty(value = "extendedLocation")
+    private ExtendedLocation extendedLocation;
 
     /**
      * Get specifies information about the marketplace image used to create the virtual machine. This element is only used for marketplace images. Before you can use a marketplace image from an API, you must enable the image for programmatic use.  In the Azure portal, find the marketplace image that you want to use and then click **Want to deploy programmatically, Get Started -&gt;**. Enter any required information and then click **Save**.
@@ -326,6 +375,26 @@ public class VirtualMachineInner extends Resource {
      */
     public VirtualMachineInner withNetworkProfile(NetworkProfile networkProfile) {
         this.networkProfile = networkProfile;
+        return this;
+    }
+
+    /**
+     * Get specifies the Security related profile settings for the virtual machine.
+     *
+     * @return the securityProfile value
+     */
+    public SecurityProfile securityProfile() {
+        return this.securityProfile;
+    }
+
+    /**
+     * Set specifies the Security related profile settings for the virtual machine.
+     *
+     * @param securityProfile the securityProfile value to set
+     * @return the VirtualMachineInner object itself.
+     */
+    public VirtualMachineInner withSecurityProfile(SecurityProfile securityProfile) {
+        this.securityProfile = securityProfile;
         return this;
     }
 
@@ -490,6 +559,26 @@ public class VirtualMachineInner extends Resource {
     }
 
     /**
+     * Get specifies information about the dedicated host group that the virtual machine resides in. &lt;br&gt;&lt;br&gt;Minimum api-version: 2020-06-01. &lt;br&gt;&lt;br&gt;NOTE: User cannot specify both host and hostGroup properties.
+     *
+     * @return the hostGroup value
+     */
+    public SubResource hostGroup() {
+        return this.hostGroup;
+    }
+
+    /**
+     * Set specifies information about the dedicated host group that the virtual machine resides in. &lt;br&gt;&lt;br&gt;Minimum api-version: 2020-06-01. &lt;br&gt;&lt;br&gt;NOTE: User cannot specify both host and hostGroup properties.
+     *
+     * @param hostGroup the hostGroup value to set
+     * @return the VirtualMachineInner object itself.
+     */
+    public VirtualMachineInner withHostGroup(SubResource hostGroup) {
+        this.hostGroup = hostGroup;
+        return this;
+    }
+
+    /**
      * Get the provisioning state, which only appears in the response.
      *
      * @return the provisioningState value
@@ -508,7 +597,7 @@ public class VirtualMachineInner extends Resource {
     }
 
     /**
-     * Get specifies that the image or disk that is being used was licensed on-premises. This element is only used for images that contain the Windows Server operating system. &lt;br&gt;&lt;br&gt; Possible values are: &lt;br&gt;&lt;br&gt; Windows_Client &lt;br&gt;&lt;br&gt; Windows_Server &lt;br&gt;&lt;br&gt; If this element is included in a request for an update, the value must match the initial value. This value cannot be updated. &lt;br&gt;&lt;br&gt; For more information, see [Azure Hybrid Use Benefit for Windows Server](https://docs.microsoft.com/azure/virtual-machines/virtual-machines-windows-hybrid-use-benefit-licensing?toc=%2fazure%2fvirtual-machines%2fwindows%2ftoc.json) &lt;br&gt;&lt;br&gt; Minimum api-version: 2015-06-15.
+     * Get specifies that the image or disk that is being used was licensed on-premises. &lt;br&gt;&lt;br&gt; Possible values for Windows Server operating system are: &lt;br&gt;&lt;br&gt; Windows_Client &lt;br&gt;&lt;br&gt; Windows_Server &lt;br&gt;&lt;br&gt; Possible values for Linux Server operating system are: &lt;br&gt;&lt;br&gt; RHEL_BYOS (for RHEL) &lt;br&gt;&lt;br&gt; SLES_BYOS (for SUSE) &lt;br&gt;&lt;br&gt; For more information, see [Azure Hybrid Use Benefit for Windows Server](https://docs.microsoft.com/azure/virtual-machines/windows/hybrid-use-benefit-licensing) &lt;br&gt;&lt;br&gt; [Azure Hybrid Use Benefit for Linux Server](https://docs.microsoft.com/azure/virtual-machines/linux/azure-hybrid-benefit-linux) &lt;br&gt;&lt;br&gt; Minimum api-version: 2015-06-15.
      *
      * @return the licenseType value
      */
@@ -517,7 +606,7 @@ public class VirtualMachineInner extends Resource {
     }
 
     /**
-     * Set specifies that the image or disk that is being used was licensed on-premises. This element is only used for images that contain the Windows Server operating system. &lt;br&gt;&lt;br&gt; Possible values are: &lt;br&gt;&lt;br&gt; Windows_Client &lt;br&gt;&lt;br&gt; Windows_Server &lt;br&gt;&lt;br&gt; If this element is included in a request for an update, the value must match the initial value. This value cannot be updated. &lt;br&gt;&lt;br&gt; For more information, see [Azure Hybrid Use Benefit for Windows Server](https://docs.microsoft.com/azure/virtual-machines/virtual-machines-windows-hybrid-use-benefit-licensing?toc=%2fazure%2fvirtual-machines%2fwindows%2ftoc.json) &lt;br&gt;&lt;br&gt; Minimum api-version: 2015-06-15.
+     * Set specifies that the image or disk that is being used was licensed on-premises. &lt;br&gt;&lt;br&gt; Possible values for Windows Server operating system are: &lt;br&gt;&lt;br&gt; Windows_Client &lt;br&gt;&lt;br&gt; Windows_Server &lt;br&gt;&lt;br&gt; Possible values for Linux Server operating system are: &lt;br&gt;&lt;br&gt; RHEL_BYOS (for RHEL) &lt;br&gt;&lt;br&gt; SLES_BYOS (for SUSE) &lt;br&gt;&lt;br&gt; For more information, see [Azure Hybrid Use Benefit for Windows Server](https://docs.microsoft.com/azure/virtual-machines/windows/hybrid-use-benefit-licensing) &lt;br&gt;&lt;br&gt; [Azure Hybrid Use Benefit for Linux Server](https://docs.microsoft.com/azure/virtual-machines/linux/azure-hybrid-benefit-linux) &lt;br&gt;&lt;br&gt; Minimum api-version: 2015-06-15.
      *
      * @param licenseType the licenseType value to set
      * @return the VirtualMachineInner object itself.
@@ -534,6 +623,46 @@ public class VirtualMachineInner extends Resource {
      */
     public String vmId() {
         return this.vmId;
+    }
+
+    /**
+     * Get specifies the time alloted for all extensions to start. The time duration should be between 15 minutes and 120 minutes (inclusive) and should be specified in ISO 8601 format. The default value is 90 minutes (PT1H30M). &lt;br&gt;&lt;br&gt; Minimum api-version: 2020-06-01.
+     *
+     * @return the extensionsTimeBudget value
+     */
+    public String extensionsTimeBudget() {
+        return this.extensionsTimeBudget;
+    }
+
+    /**
+     * Set specifies the time alloted for all extensions to start. The time duration should be between 15 minutes and 120 minutes (inclusive) and should be specified in ISO 8601 format. The default value is 90 minutes (PT1H30M). &lt;br&gt;&lt;br&gt; Minimum api-version: 2020-06-01.
+     *
+     * @param extensionsTimeBudget the extensionsTimeBudget value to set
+     * @return the VirtualMachineInner object itself.
+     */
+    public VirtualMachineInner withExtensionsTimeBudget(String extensionsTimeBudget) {
+        this.extensionsTimeBudget = extensionsTimeBudget;
+        return this;
+    }
+
+    /**
+     * Get specifies the scale set logical fault domain into which the Virtual Machine will be created. By default, the Virtual Machine will by automatically assigned to a fault domain that best maintains balance across available fault domains.&lt;br&gt;&lt;li&gt;This is applicable only if the 'virtualMachineScaleSet' property of this Virtual Machine is set.&lt;li&gt;The Virtual Machine Scale Set that is referenced, must have 'platformFaultDomainCount' &amp;gt; 1.&lt;li&gt;This property cannot be updated once the Virtual Machine is created.&lt;li&gt;Fault domain assignment can be viewed in the Virtual Machine Instance View.&lt;br&gt;&lt;br&gt;Minimum api‐version: 2020‐12‐01.
+     *
+     * @return the platformFaultDomain value
+     */
+    public Integer platformFaultDomain() {
+        return this.platformFaultDomain;
+    }
+
+    /**
+     * Set specifies the scale set logical fault domain into which the Virtual Machine will be created. By default, the Virtual Machine will by automatically assigned to a fault domain that best maintains balance across available fault domains.&lt;br&gt;&lt;li&gt;This is applicable only if the 'virtualMachineScaleSet' property of this Virtual Machine is set.&lt;li&gt;The Virtual Machine Scale Set that is referenced, must have 'platformFaultDomainCount' &amp;gt; 1.&lt;li&gt;This property cannot be updated once the Virtual Machine is created.&lt;li&gt;Fault domain assignment can be viewed in the Virtual Machine Instance View.&lt;br&gt;&lt;br&gt;Minimum api‐version: 2020‐12‐01.
+     *
+     * @param platformFaultDomain the platformFaultDomain value to set
+     * @return the VirtualMachineInner object itself.
+     */
+    public VirtualMachineInner withPlatformFaultDomain(Integer platformFaultDomain) {
+        this.platformFaultDomain = platformFaultDomain;
+        return this;
     }
 
     /**
@@ -582,6 +711,26 @@ public class VirtualMachineInner extends Resource {
      */
     public VirtualMachineInner withZones(List<String> zones) {
         this.zones = zones;
+        return this;
+    }
+
+    /**
+     * Get the extended location of the Virtual Machine.
+     *
+     * @return the extendedLocation value
+     */
+    public ExtendedLocation extendedLocation() {
+        return this.extendedLocation;
+    }
+
+    /**
+     * Set the extended location of the Virtual Machine.
+     *
+     * @param extendedLocation the extendedLocation value to set
+     * @return the VirtualMachineInner object itself.
+     */
+    public VirtualMachineInner withExtendedLocation(ExtendedLocation extendedLocation) {
+        this.extendedLocation = extendedLocation;
         return this;
     }
 

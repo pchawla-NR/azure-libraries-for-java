@@ -9,12 +9,16 @@
 package com.microsoft.azure.management.compute.implementation;
 
 import com.microsoft.azure.management.compute.SnapshotSku;
+import com.microsoft.azure.management.compute.ExtendedLocation;
 import org.joda.time.DateTime;
 import com.microsoft.azure.management.compute.OperatingSystemTypes;
 import com.microsoft.azure.management.compute.HyperVGeneration;
+import com.microsoft.azure.management.compute.PurchasePlan;
 import com.microsoft.azure.management.compute.CreationData;
+import com.microsoft.azure.management.compute.DiskState;
 import com.microsoft.azure.management.compute.EncryptionSettingsCollection;
 import com.microsoft.azure.management.compute.Encryption;
+import com.microsoft.azure.management.compute.NetworkAccessPolicy;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microsoft.rest.serializer.JsonFlatten;
 import com.microsoft.azure.Resource;
@@ -37,7 +41,14 @@ public class SnapshotInner extends Resource {
     private SnapshotSku sku;
 
     /**
-     * The time when the disk was created.
+     * The extended location where the snapshot will be created. Extended
+     * location cannot be changed.
+     */
+    @JsonProperty(value = "extendedLocation")
+    private ExtendedLocation extendedLocation;
+
+    /**
+     * The time when the snapshot was created.
      */
     @JsonProperty(value = "properties.timeCreated", access = JsonProperty.Access.WRITE_ONLY)
     private DateTime timeCreated;
@@ -54,6 +65,13 @@ public class SnapshotInner extends Resource {
      */
     @JsonProperty(value = "properties.hyperVGeneration")
     private HyperVGeneration hyperVGeneration;
+
+    /**
+     * Purchase plan information for the image from which the source disk for
+     * the snapshot was originally created.
+     */
+    @JsonProperty(value = "properties.purchasePlan")
+    private PurchasePlan purchasePlan;
 
     /**
      * Disk source information. CreationData information cannot be changed
@@ -77,6 +95,13 @@ public class SnapshotInner extends Resource {
      */
     @JsonProperty(value = "properties.diskSizeBytes", access = JsonProperty.Access.WRITE_ONLY)
     private Long diskSizeBytes;
+
+    /**
+     * The state of the snapshot. Possible values include: 'Unattached',
+     * 'Attached', 'Reserved', 'ActiveSAS', 'ReadyToUpload', 'ActiveUpload'.
+     */
+    @JsonProperty(value = "properties.diskState")
+    private DiskState diskState;
 
     /**
      * Unique Guid identifying the resource.
@@ -112,6 +137,18 @@ public class SnapshotInner extends Resource {
     private Encryption encryption;
 
     /**
+     * Possible values include: 'AllowAll', 'AllowPrivate', 'DenyAll'.
+     */
+    @JsonProperty(value = "properties.networkAccessPolicy")
+    private NetworkAccessPolicy networkAccessPolicy;
+
+    /**
+     * ARM id of the DiskAccess resource for using private endpoints on disks.
+     */
+    @JsonProperty(value = "properties.diskAccessId")
+    private String diskAccessId;
+
+    /**
      * Get unused. Always Null.
      *
      * @return the managedBy value
@@ -141,7 +178,27 @@ public class SnapshotInner extends Resource {
     }
 
     /**
-     * Get the time when the disk was created.
+     * Get the extended location where the snapshot will be created. Extended location cannot be changed.
+     *
+     * @return the extendedLocation value
+     */
+    public ExtendedLocation extendedLocation() {
+        return this.extendedLocation;
+    }
+
+    /**
+     * Set the extended location where the snapshot will be created. Extended location cannot be changed.
+     *
+     * @param extendedLocation the extendedLocation value to set
+     * @return the SnapshotInner object itself.
+     */
+    public SnapshotInner withExtendedLocation(ExtendedLocation extendedLocation) {
+        this.extendedLocation = extendedLocation;
+        return this;
+    }
+
+    /**
+     * Get the time when the snapshot was created.
      *
      * @return the timeCreated value
      */
@@ -186,6 +243,26 @@ public class SnapshotInner extends Resource {
      */
     public SnapshotInner withHyperVGeneration(HyperVGeneration hyperVGeneration) {
         this.hyperVGeneration = hyperVGeneration;
+        return this;
+    }
+
+    /**
+     * Get purchase plan information for the image from which the source disk for the snapshot was originally created.
+     *
+     * @return the purchasePlan value
+     */
+    public PurchasePlan purchasePlan() {
+        return this.purchasePlan;
+    }
+
+    /**
+     * Set purchase plan information for the image from which the source disk for the snapshot was originally created.
+     *
+     * @param purchasePlan the purchasePlan value to set
+     * @return the SnapshotInner object itself.
+     */
+    public SnapshotInner withPurchasePlan(PurchasePlan purchasePlan) {
+        this.purchasePlan = purchasePlan;
         return this;
     }
 
@@ -236,6 +313,26 @@ public class SnapshotInner extends Resource {
      */
     public Long diskSizeBytes() {
         return this.diskSizeBytes;
+    }
+
+    /**
+     * Get the state of the snapshot. Possible values include: 'Unattached', 'Attached', 'Reserved', 'ActiveSAS', 'ReadyToUpload', 'ActiveUpload'.
+     *
+     * @return the diskState value
+     */
+    public DiskState diskState() {
+        return this.diskState;
+    }
+
+    /**
+     * Set the state of the snapshot. Possible values include: 'Unattached', 'Attached', 'Reserved', 'ActiveSAS', 'ReadyToUpload', 'ActiveUpload'.
+     *
+     * @param diskState the diskState value to set
+     * @return the SnapshotInner object itself.
+     */
+    public SnapshotInner withDiskState(DiskState diskState) {
+        this.diskState = diskState;
+        return this;
     }
 
     /**
@@ -313,6 +410,46 @@ public class SnapshotInner extends Resource {
      */
     public SnapshotInner withEncryption(Encryption encryption) {
         this.encryption = encryption;
+        return this;
+    }
+
+    /**
+     * Get possible values include: 'AllowAll', 'AllowPrivate', 'DenyAll'.
+     *
+     * @return the networkAccessPolicy value
+     */
+    public NetworkAccessPolicy networkAccessPolicy() {
+        return this.networkAccessPolicy;
+    }
+
+    /**
+     * Set possible values include: 'AllowAll', 'AllowPrivate', 'DenyAll'.
+     *
+     * @param networkAccessPolicy the networkAccessPolicy value to set
+     * @return the SnapshotInner object itself.
+     */
+    public SnapshotInner withNetworkAccessPolicy(NetworkAccessPolicy networkAccessPolicy) {
+        this.networkAccessPolicy = networkAccessPolicy;
+        return this;
+    }
+
+    /**
+     * Get aRM id of the DiskAccess resource for using private endpoints on disks.
+     *
+     * @return the diskAccessId value
+     */
+    public String diskAccessId() {
+        return this.diskAccessId;
+    }
+
+    /**
+     * Set aRM id of the DiskAccess resource for using private endpoints on disks.
+     *
+     * @param diskAccessId the diskAccessId value to set
+     * @return the SnapshotInner object itself.
+     */
+    public SnapshotInner withDiskAccessId(String diskAccessId) {
+        this.diskAccessId = diskAccessId;
         return this;
     }
 

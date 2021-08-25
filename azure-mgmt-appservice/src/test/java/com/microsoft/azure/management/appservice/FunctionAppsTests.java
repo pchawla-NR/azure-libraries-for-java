@@ -129,7 +129,7 @@ public class FunctionAppsTests extends AppServiceTest {
 
         // Update
         functionApp2.update()
-                .withNewStorageAccount(STORAGE_ACCOUNT_NAME_1, StorageAccountSkuType.STANDARD_GRS)
+                .withNewStorageAccount(STORAGE_ACCOUNT_NAME_1, StorageAccountSkuType.STANDARD_LRS)
                 .apply();
         Assert.assertEquals(STORAGE_ACCOUNT_NAME_1, functionApp2.storageAccount().name());
 
@@ -163,7 +163,7 @@ public class FunctionAppsTests extends AppServiceTest {
     }
 
     private static final String FUNCTION_APP_PACKAGE_URL =
-            "https://raw.githubusercontent.com/Azure/azure-sdk-for-java/master/sdk/appservice/mgmt/src/test/resources/java-functions.zip";
+            "https://raw.githubusercontent.com/Azure/azure-libraries-for-java/master/azure-mgmt-appservice/src/test/resources/java-functions.zip";
 
     @Test
     public void canCRUDLinuxFunctionApp() throws Exception {

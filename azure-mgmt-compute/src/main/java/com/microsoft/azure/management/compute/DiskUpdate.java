@@ -87,6 +87,40 @@ public class DiskUpdate {
     private Encryption encryption;
 
     /**
+     * Possible values include: 'AllowAll', 'AllowPrivate', 'DenyAll'.
+     */
+    @JsonProperty(value = "properties.networkAccessPolicy")
+    private NetworkAccessPolicy networkAccessPolicy;
+
+    /**
+     * ARM id of the DiskAccess resource for using private endpoints on disks.
+     */
+    @JsonProperty(value = "properties.diskAccessId")
+    private String diskAccessId;
+
+    /**
+     * Performance tier of the disk (e.g, P4, S10) as described here:
+     * https://azure.microsoft.com/en-us/pricing/details/managed-disks/. Does
+     * not apply to Ultra disks.
+     */
+    @JsonProperty(value = "properties.tier")
+    private String tier;
+
+    /**
+     * Set to true to enable bursting beyond the provisioned performance target
+     * of the disk. Bursting is disabled by default. Does not apply to Ultra
+     * disks.
+     */
+    @JsonProperty(value = "properties.burstingEnabled")
+    private Boolean burstingEnabled;
+
+    /**
+     * Purchase plan information to be added on the OS disk.
+     */
+    @JsonProperty(value = "properties.purchasePlan")
+    private PurchasePlan purchasePlan;
+
+    /**
      * Resource tags.
      */
     @JsonProperty(value = "tags")
@@ -275,6 +309,106 @@ public class DiskUpdate {
      */
     public DiskUpdate withEncryption(Encryption encryption) {
         this.encryption = encryption;
+        return this;
+    }
+
+    /**
+     * Get possible values include: 'AllowAll', 'AllowPrivate', 'DenyAll'.
+     *
+     * @return the networkAccessPolicy value
+     */
+    public NetworkAccessPolicy networkAccessPolicy() {
+        return this.networkAccessPolicy;
+    }
+
+    /**
+     * Set possible values include: 'AllowAll', 'AllowPrivate', 'DenyAll'.
+     *
+     * @param networkAccessPolicy the networkAccessPolicy value to set
+     * @return the DiskUpdate object itself.
+     */
+    public DiskUpdate withNetworkAccessPolicy(NetworkAccessPolicy networkAccessPolicy) {
+        this.networkAccessPolicy = networkAccessPolicy;
+        return this;
+    }
+
+    /**
+     * Get aRM id of the DiskAccess resource for using private endpoints on disks.
+     *
+     * @return the diskAccessId value
+     */
+    public String diskAccessId() {
+        return this.diskAccessId;
+    }
+
+    /**
+     * Set aRM id of the DiskAccess resource for using private endpoints on disks.
+     *
+     * @param diskAccessId the diskAccessId value to set
+     * @return the DiskUpdate object itself.
+     */
+    public DiskUpdate withDiskAccessId(String diskAccessId) {
+        this.diskAccessId = diskAccessId;
+        return this;
+    }
+
+    /**
+     * Get performance tier of the disk (e.g, P4, S10) as described here: https://azure.microsoft.com/en-us/pricing/details/managed-disks/. Does not apply to Ultra disks.
+     *
+     * @return the tier value
+     */
+    public String tier() {
+        return this.tier;
+    }
+
+    /**
+     * Set performance tier of the disk (e.g, P4, S10) as described here: https://azure.microsoft.com/en-us/pricing/details/managed-disks/. Does not apply to Ultra disks.
+     *
+     * @param tier the tier value to set
+     * @return the DiskUpdate object itself.
+     */
+    public DiskUpdate withTier(String tier) {
+        this.tier = tier;
+        return this;
+    }
+
+    /**
+     * Get set to true to enable bursting beyond the provisioned performance target of the disk. Bursting is disabled by default. Does not apply to Ultra disks.
+     *
+     * @return the burstingEnabled value
+     */
+    public Boolean burstingEnabled() {
+        return this.burstingEnabled;
+    }
+
+    /**
+     * Set set to true to enable bursting beyond the provisioned performance target of the disk. Bursting is disabled by default. Does not apply to Ultra disks.
+     *
+     * @param burstingEnabled the burstingEnabled value to set
+     * @return the DiskUpdate object itself.
+     */
+    public DiskUpdate withBurstingEnabled(Boolean burstingEnabled) {
+        this.burstingEnabled = burstingEnabled;
+        return this;
+    }
+
+    /**
+     * Get purchase plan information to be added on the OS disk.
+     *
+     * @return the purchasePlan value
+     */
+    public PurchasePlan purchasePlan() {
+        return this.purchasePlan;
+    }
+
+    /**
+     * Set purchase plan information to be added on the OS disk.
+     *
+     * @param purchasePlan the purchasePlan value to set
+     * @return the DiskUpdate object itself.
+     */
+    public DiskUpdate withPurchasePlan(PurchasePlan purchasePlan) {
+        this.purchasePlan = purchasePlan;
         return this;
     }
 

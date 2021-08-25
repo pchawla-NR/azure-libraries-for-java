@@ -16,8 +16,10 @@ import com.microsoft.azure.management.compute.VirtualMachineScaleSetVMProfile;
 import com.microsoft.azure.SubResource;
 import com.microsoft.azure.management.compute.AdditionalCapabilities;
 import com.microsoft.azure.management.compute.ScaleInPolicy;
+import com.microsoft.azure.management.compute.OrchestrationMode;
 import com.microsoft.azure.management.compute.VirtualMachineScaleSetIdentity;
 import java.util.List;
+import com.microsoft.azure.management.compute.ExtendedLocation;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microsoft.rest.serializer.JsonFlatten;
 import com.microsoft.azure.Resource;
@@ -121,6 +123,14 @@ public class VirtualMachineScaleSetInner extends Resource {
     private SubResource proximityPlacementGroup;
 
     /**
+     * Specifies information about the dedicated host group that the virtual
+     * machine scale set resides in. &lt;br&gt;&lt;br&gt;Minimum api-version:
+     * 2020-06-01.
+     */
+    @JsonProperty(value = "properties.hostGroup")
+    private SubResource hostGroup;
+
+    /**
      * Specifies additional capabilities enabled or disabled on the Virtual
      * Machines in the Virtual Machine Scale Set. For instance: whether the
      * Virtual Machines have the capability to support attaching managed data
@@ -137,6 +147,13 @@ public class VirtualMachineScaleSetInner extends Resource {
     private ScaleInPolicy scaleInPolicy;
 
     /**
+     * Specifies the orchestration mode for the virtual machine scale set.
+     * Possible values include: 'Uniform', 'Flexible'.
+     */
+    @JsonProperty(value = "properties.orchestrationMode")
+    private OrchestrationMode orchestrationMode;
+
+    /**
      * The identity of the virtual machine scale set, if configured.
      */
     @JsonProperty(value = "identity")
@@ -148,6 +165,12 @@ public class VirtualMachineScaleSetInner extends Resource {
      */
     @JsonProperty(value = "zones")
     private List<String> zones;
+
+    /**
+     * The extended location of the Virtual Machine Scale Set.
+     */
+    @JsonProperty(value = "extendedLocation")
+    private ExtendedLocation extendedLocation;
 
     /**
      * Get the virtual machine scale set sku.
@@ -388,6 +411,26 @@ public class VirtualMachineScaleSetInner extends Resource {
     }
 
     /**
+     * Get specifies information about the dedicated host group that the virtual machine scale set resides in. &lt;br&gt;&lt;br&gt;Minimum api-version: 2020-06-01.
+     *
+     * @return the hostGroup value
+     */
+    public SubResource hostGroup() {
+        return this.hostGroup;
+    }
+
+    /**
+     * Set specifies information about the dedicated host group that the virtual machine scale set resides in. &lt;br&gt;&lt;br&gt;Minimum api-version: 2020-06-01.
+     *
+     * @param hostGroup the hostGroup value to set
+     * @return the VirtualMachineScaleSetInner object itself.
+     */
+    public VirtualMachineScaleSetInner withHostGroup(SubResource hostGroup) {
+        this.hostGroup = hostGroup;
+        return this;
+    }
+
+    /**
      * Get specifies additional capabilities enabled or disabled on the Virtual Machines in the Virtual Machine Scale Set. For instance: whether the Virtual Machines have the capability to support attaching managed data disks with UltraSSD_LRS storage account type.
      *
      * @return the additionalCapabilities value
@@ -428,6 +471,26 @@ public class VirtualMachineScaleSetInner extends Resource {
     }
 
     /**
+     * Get specifies the orchestration mode for the virtual machine scale set. Possible values include: 'Uniform', 'Flexible'.
+     *
+     * @return the orchestrationMode value
+     */
+    public OrchestrationMode orchestrationMode() {
+        return this.orchestrationMode;
+    }
+
+    /**
+     * Set specifies the orchestration mode for the virtual machine scale set. Possible values include: 'Uniform', 'Flexible'.
+     *
+     * @param orchestrationMode the orchestrationMode value to set
+     * @return the VirtualMachineScaleSetInner object itself.
+     */
+    public VirtualMachineScaleSetInner withOrchestrationMode(OrchestrationMode orchestrationMode) {
+        this.orchestrationMode = orchestrationMode;
+        return this;
+    }
+
+    /**
      * Get the identity of the virtual machine scale set, if configured.
      *
      * @return the identity value
@@ -464,6 +527,26 @@ public class VirtualMachineScaleSetInner extends Resource {
      */
     public VirtualMachineScaleSetInner withZones(List<String> zones) {
         this.zones = zones;
+        return this;
+    }
+
+    /**
+     * Get the extended location of the Virtual Machine Scale Set.
+     *
+     * @return the extendedLocation value
+     */
+    public ExtendedLocation extendedLocation() {
+        return this.extendedLocation;
+    }
+
+    /**
+     * Set the extended location of the Virtual Machine Scale Set.
+     *
+     * @param extendedLocation the extendedLocation value to set
+     * @return the VirtualMachineScaleSetInner object itself.
+     */
+    public VirtualMachineScaleSetInner withExtendedLocation(ExtendedLocation extendedLocation) {
+        this.extendedLocation = extendedLocation;
         return this;
     }
 

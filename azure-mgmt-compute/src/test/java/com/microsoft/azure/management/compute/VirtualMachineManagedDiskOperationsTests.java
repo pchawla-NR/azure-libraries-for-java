@@ -7,6 +7,7 @@
 package com.microsoft.azure.management.compute;
 
 import com.microsoft.azure.management.resources.ResourceGroup;
+import com.microsoft.azure.management.resources.core.TestUtilities;
 import com.microsoft.azure.management.resources.fluentcore.arm.Region;
 import com.microsoft.azure.management.resources.fluentcore.model.Creatable;
 import com.microsoft.rest.RestClient;
@@ -35,7 +36,7 @@ public class VirtualMachineManagedDiskOperationsTests extends ComputeManagementT
         final String vmName1 = "myvm1";
         final String publicIpDnsLabel = generateRandomResourceName("pip", 20);
         final String uname = "juser";
-        final String password = "123tEst!@|ac";
+        final String password = TestUtilities.createPassword();
 
         VirtualMachine virtualMachine = computeManager.virtualMachines()
                 .define(vmName1)
@@ -47,7 +48,7 @@ public class VirtualMachineManagedDiskOperationsTests extends ComputeManagementT
                 .withPopularLinuxImage(linuxImage)
                 .withRootUsername(uname)
                 .withRootPassword(password)
-                .withSize(VirtualMachineSizeTypes.STANDARD_D5_V2)
+                .withSize(VirtualMachineSizeTypes.fromString("Standard_D2a_v4"))
                 .withOSDiskCaching(CachingTypes.READ_WRITE)
                 .create();
         // Ensure default to managed disk
@@ -58,7 +59,7 @@ public class VirtualMachineManagedDiskOperationsTests extends ComputeManagementT
         //
         Assert.assertNotNull(virtualMachine.osDiskStorageAccountType());
         Assert.assertEquals(virtualMachine.osDiskCachingType(), CachingTypes.READ_WRITE);
-        Assert.assertEquals(virtualMachine.size(), VirtualMachineSizeTypes.STANDARD_D5_V2);
+        Assert.assertEquals(virtualMachine.size(), VirtualMachineSizeTypes.fromString("Standard_D2a_v4"));
         // Validate the implicit managed disk created by CRP to back the os disk
         //
         Assert.assertNotNull(virtualMachine.osDiskId());
@@ -80,7 +81,7 @@ public class VirtualMachineManagedDiskOperationsTests extends ComputeManagementT
     public void canCreateUpdateVirtualMachineWithEmptyManagedDataDisks() {
         final String publicIpDnsLabel = generateRandomResourceName("pip", 20);
         final String uname = "juser";
-        final String password = "123tEst!@|ac";
+        final String password = TestUtilities.createPassword();
         // Create with implicit + explicit empty disks, check default and override
         //
         final String vmName1 = "myvm1";
@@ -131,7 +132,7 @@ public class VirtualMachineManagedDiskOperationsTests extends ComputeManagementT
                 .withNewDataDisk(creatableEmptyDisk2, 2, CachingTypes.NONE)       // CreateOption: ATTACH
                 .withNewDataDisk(creatableEmptyDisk3, 3, CachingTypes.NONE)       // CreateOption: ATTACH
                 // End : Add 5 empty managed disks
-                .withSize(VirtualMachineSizeTypes.STANDARD_D5_V2)
+                .withSize(VirtualMachineSizeTypes.fromString("Standard_D4a_v4"))
                 .withOSDiskCaching(CachingTypes.READ_WRITE)
                 .create();
 
@@ -235,7 +236,7 @@ public class VirtualMachineManagedDiskOperationsTests extends ComputeManagementT
     public void canCreateVirtualMachineFromCustomImageWithManagedDisks() {
         final String publicIpDnsLabel = generateRandomResourceName("pip", 20);
         final String uname = "juser";
-        final String password = "123tEst!@|ac";
+        final String password = TestUtilities.createPassword();
         // Create with implicit + explicit empty disks, check default and override
         //
         final String vmName1 = "myvm1";
@@ -286,15 +287,12 @@ public class VirtualMachineManagedDiskOperationsTests extends ComputeManagementT
                 .withNewDataDisk(creatableEmptyDisk2, 2, CachingTypes.NONE)       // CreateOption: ATTACH
                 .withNewDataDisk(creatableEmptyDisk3, 3, CachingTypes.NONE)       // CreateOption: ATTACH
                 // End : Add bunch of empty managed disks
-                .withSize(VirtualMachineSizeTypes.STANDARD_D5_V2)
+                .withSize(VirtualMachineSizeTypes.fromString("Standard_D4a_v4"))
                 .withOSDiskCaching(CachingTypes.READ_WRITE)
                 .create();
         System.out.println("Waiting for some time before de-provision");
         sleep(60 * 1000); // Wait for some time to ensure vm is publicly accessible
-        deprovisionAgentInLinuxVM(virtualMachine1.getPrimaryPublicIPAddress().fqdn(),
-                22,
-                uname,
-                password);
+        deprovisionAgentInLinuxVM(virtualMachine1);
 
         virtualMachine1.deallocate();
         virtualMachine1.generalize();
@@ -334,7 +332,7 @@ public class VirtualMachineManagedDiskOperationsTests extends ComputeManagementT
                 .withRootUsername(uname)
                 .withRootPassword(password)
                 // No explicit data disks, let CRP create it from the image's data disk images
-                .withSize(VirtualMachineSizeTypes.STANDARD_D5_V2)
+                .withSize(VirtualMachineSizeTypes.fromString("Standard_D4a_v4"))
                 .withOSDiskCaching(CachingTypes.READ_WRITE)
                 .create();
 
@@ -376,7 +374,7 @@ public class VirtualMachineManagedDiskOperationsTests extends ComputeManagementT
         }
         VirtualMachine virtualMachine3 = creatableVirtualMachine3
                 .withNewDataDisk(200)                               // CreateOption: EMPTY
-                .withSize(VirtualMachineSizeTypes.STANDARD_D5_V2)
+                .withSize(VirtualMachineSizeTypes.fromString("Standard_D4a_v4"))
                 .withOSDiskCaching(CachingTypes.READ_WRITE)
                 .create();
 
@@ -396,7 +394,7 @@ public class VirtualMachineManagedDiskOperationsTests extends ComputeManagementT
     public void canUpdateVirtualMachineByAddingAndRemovingManagedDisks() {
         final String publicIpDnsLabel = generateRandomResourceName("pip", 20);
         final String uname = "juser";
-        final String password = "123tEst!@|ac";
+        final String password = TestUtilities.createPassword();
         // Create with implicit + explicit empty disks, check default and override
         //
         final String vmName1 = "myvm1";
@@ -448,7 +446,7 @@ public class VirtualMachineManagedDiskOperationsTests extends ComputeManagementT
                 // End : Add bunch of empty managed disks
                 .withDataDiskDefaultCachingType(CachingTypes.READ_ONLY)
                 .withDataDiskDefaultStorageAccountType(StorageAccountTypes.STANDARD_LRS)
-                .withSize(VirtualMachineSizeTypes.STANDARD_D5_V2)
+                .withSize(VirtualMachineSizeTypes.fromString("Standard_D4a_v4"))
                 .withOSDiskCaching(CachingTypes.READ_WRITE)
                 .create();
 
@@ -467,7 +465,7 @@ public class VirtualMachineManagedDiskOperationsTests extends ComputeManagementT
     @Test
     public void canCreateVirtualMachineByAttachingManagedOsDisk() {
         final String uname = "juser";
-        final String password = "123tEst!@|ac";
+        final String password = TestUtilities.createPassword();
         final String vmName = "myvm6";
         final String storageAccountName = generateRandomResourceName("stg", 17);
 
@@ -484,7 +482,7 @@ public class VirtualMachineManagedDiskOperationsTests extends ComputeManagementT
                 .withRootUsername(uname)
                 .withRootPassword(password)
                 .withUnmanagedDisks()                  /* UN-MANAGED OS and DATA DISKS */
-                .withSize(VirtualMachineSizeTypes.STANDARD_D5_V2)
+                .withSize(VirtualMachineSizeTypes.fromString("Standard_D2a_v4"))
                 .withNewStorageAccount(storageAccountName)
                 .withOSDiskCaching(CachingTypes.READ_WRITE)
                 .create();
@@ -513,7 +511,7 @@ public class VirtualMachineManagedDiskOperationsTests extends ComputeManagementT
                 .withPrimaryPrivateIPAddressDynamic()
                 .withoutPrimaryPublicIPAddress()
                 .withSpecializedOSDisk(osDisk, OperatingSystemTypes.LINUX)
-                .withSize(VirtualMachineSizeTypes.STANDARD_D5_V2)
+                .withSize(VirtualMachineSizeTypes.fromString("Standard_D2a_v4"))
                 .withOSDiskCaching(CachingTypes.READ_WRITE)
                 .create();
 
@@ -525,7 +523,7 @@ public class VirtualMachineManagedDiskOperationsTests extends ComputeManagementT
     public void canCreateVirtualMachineWithManagedDiskInManagedAvailabilitySet() {
         final String availSetName = generateRandomResourceName("av-", 15);
         final String uname = "juser";
-        final String password = "123tEst!@|ac";
+        final String password = TestUtilities.createPassword();
         final String vmName = "myvm6";
 
         VirtualMachine managedVm = computeManager.virtualMachines()
@@ -542,7 +540,7 @@ public class VirtualMachineManagedDiskOperationsTests extends ComputeManagementT
                 .withNewDataDisk(100, 1, CachingTypes.READ_ONLY)
                 .withNewDataDisk(100, 2, CachingTypes.READ_WRITE, StorageAccountTypes.STANDARD_LRS)
                 .withNewAvailabilitySet(availSetName)           // Default to managed availability set
-                .withSize(VirtualMachineSizeTypes.STANDARD_D5_V2)
+                .withSize(VirtualMachineSizeTypes.fromString("Standard_D2a_v4"))
                 .withOSDiskCaching(CachingTypes.READ_WRITE)
                 .create();
 

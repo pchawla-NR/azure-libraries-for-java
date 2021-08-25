@@ -32,13 +32,25 @@ public class ProviderResourceType {
      * The aliases that are supported by this resource type.
      */
     @JsonProperty(value = "aliases")
-    private List<AliasType> aliases;
+    private List<Alias> aliases;
 
     /**
      * The API version.
      */
     @JsonProperty(value = "apiVersions")
     private List<String> apiVersions;
+
+    /**
+     * The default API version.
+     */
+    @JsonProperty(value = "defaultApiVersion", access = JsonProperty.Access.WRITE_ONLY)
+    private String defaultApiVersion;
+
+    /**
+     * The API profiles for the resource provider.
+     */
+    @JsonProperty(value = "apiProfiles", access = JsonProperty.Access.WRITE_ONLY)
+    private List<ApiProfile> apiProfiles;
 
     /**
      * The additional capabilities offered by this resource type.
@@ -97,7 +109,7 @@ public class ProviderResourceType {
      *
      * @return the aliases value
      */
-    public List<AliasType> aliases() {
+    public List<Alias> aliases() {
         return this.aliases;
     }
 
@@ -107,7 +119,7 @@ public class ProviderResourceType {
      * @param aliases the aliases value to set
      * @return the ProviderResourceType object itself.
      */
-    public ProviderResourceType withAliases(List<AliasType> aliases) {
+    public ProviderResourceType withAliases(List<Alias> aliases) {
         this.aliases = aliases;
         return this;
     }
@@ -130,6 +142,24 @@ public class ProviderResourceType {
     public ProviderResourceType withApiVersions(List<String> apiVersions) {
         this.apiVersions = apiVersions;
         return this;
+    }
+
+    /**
+     * Get the default API version.
+     *
+     * @return the defaultApiVersion value
+     */
+    public String defaultApiVersion() {
+        return this.defaultApiVersion;
+    }
+
+    /**
+     * Get the API profiles for the resource provider.
+     *
+     * @return the apiProfiles value
+     */
+    public List<ApiProfile> apiProfiles() {
+        return this.apiProfiles;
     }
 
     /**

@@ -32,8 +32,8 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 public abstract class TestBase {
-    private PrintStream out;
-    private String baseUri;
+//    private PrintStream out;
+//    private String baseUri;
 
     public static String generateRandomResourceName(String prefix, int maxLen) {
         return SdkContext.randomResourceName(prefix, maxLen);
@@ -174,7 +174,7 @@ public abstract class TestBase {
             defaultSubscription = ZERO_SUBSCRIPTION;
             interceptorManager.addTextReplacementRule(PLAYBACK_URI_BASE + "1234", playbackUri);
             System.out.println(playbackUri);
-            out = System.out;
+//            out = System.out;
             System.setOut(new PrintStream(new OutputStream() {
                 public void write(int b) {
                     //DO NOTHING
@@ -197,16 +197,16 @@ public abstract class TestBase {
                 credentials = new ApplicationTokenCredentials(clientId, tenantId, clientSecret, AzureEnvironment.AZURE);
                 credentials.withDefaultSubscriptionId(subscriptionId);
             }
+            String baseUrl = credentials.environment().url(AzureEnvironment.Endpoint.RESOURCE_MANAGER);
             RestClient.Builder builder = new RestClient.Builder()
-                            .withBaseUrl(this.baseUri())
+                            .withBaseUrl(baseUrl)
                             .withSerializerAdapter(new AzureJacksonAdapter())
                             .withResponseBuilderFactory(new AzureResponseBuilder.Factory())
                             .withInterceptor(new ProviderRegistrationInterceptor(credentials))
                             .withNetworkInterceptor(new ResourceGroupTaggingInterceptor())
                             .withCredentials(credentials)
-                            .withLogLevel(LogLevel.NONE)
-                            .withReadTimeout(3, TimeUnit.MINUTES)
-                            .withNetworkInterceptor(new LoggingInterceptor(LogLevel.BODY_AND_HEADERS));
+                            .withLogLevel(LogLevel.BODY_AND_HEADERS)
+                            .withReadTimeout(3, TimeUnit.MINUTES);
             if (!interceptorManager.isNoneMode()) {
                 builder.withNetworkInterceptor(interceptorManager.initInterceptor());
             }
@@ -214,7 +214,7 @@ public abstract class TestBase {
             defaultSubscription = credentials.defaultSubscriptionId();
             interceptorManager.addTextReplacementRule(defaultSubscription, ZERO_SUBSCRIPTION);
             interceptorManager.addTextReplacementRule(credentials.domain(), ZERO_TENANT);
-            interceptorManager.addTextReplacementRule(baseUri(), playbackUri + "/");
+            interceptorManager.addTextReplacementRule(baseUrl, playbackUri + "/");
             interceptorManager.addTextReplacementRule("https://graph.windows.net/", playbackUri + "/");
         }
         initializeClients(restClient, defaultSubscription, credentials.domain());
@@ -233,17 +233,17 @@ public abstract class TestBase {
         interceptorManager.addTextReplacementRule(from, to);
     }
 
-    protected void setBaseUri(String baseUri) {
-        this.baseUri = baseUri;
-    }
-
-    protected String baseUri() {
-        if (this.baseUri != null) {
-            return this.baseUri;
-        } else {
-            return AzureEnvironment.AZURE.url(AzureEnvironment.Endpoint.RESOURCE_MANAGER);
-        }
-    }
+//    protected void setBaseUri(String baseUri) {
+//        this.baseUri = baseUri;
+//    }
+//
+//    protected String baseUri() {
+//        if (this.baseUri != null) {
+//            return this.baseUri;
+//        } else {
+//            return AzureEnvironment.AZURE.url(AzureEnvironment.Endpoint.RESOURCE_MANAGER);
+//        }
+//    }
 
     protected RestClient buildRestClient(RestClient.Builder builder, boolean isMocked) {
         return builder.build();

@@ -219,7 +219,7 @@ public interface Vault extends
             
             /**
              * Specifies that access to the key vault from the specific ip range should be allowed.
-             * @param ipAddressCidr
+             * @param ipAddressCidr the access value
              * @return the next stage of key vault definition
              */
             WithCreate withAccessFromIpAddressRange(String ipAddressCidr);
@@ -251,6 +251,7 @@ public interface Vault extends
             /**
              * Get the virtualNetworkRules value.
              *
+             * @param virtualNetworkRules the list of VirtualNetworkRule
              * @return the next stage of key vault definition.
              */
             WithCreate withVirtualNetworkRules(List<VirtualNetworkRule> virtualNetworkRules);

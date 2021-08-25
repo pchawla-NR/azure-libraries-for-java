@@ -14,6 +14,8 @@ import java.util.List;
 import com.microsoft.azure.management.compute.DataDiskImage;
 import com.microsoft.azure.management.compute.AutomaticOSUpgradeProperties;
 import com.microsoft.azure.management.compute.HyperVGenerationTypes;
+import com.microsoft.azure.management.compute.DisallowedConfiguration;
+import com.microsoft.azure.management.compute.VirtualMachineImageFeature;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microsoft.rest.serializer.JsonFlatten;
 
@@ -51,6 +53,19 @@ public class VirtualMachineImageInner extends VirtualMachineImageResourceInner {
      */
     @JsonProperty(value = "properties.hyperVGeneration")
     private HyperVGenerationTypes hyperVGeneration;
+
+    /**
+     * Specifies disallowed configuration for the VirtualMachine created from
+     * the image.
+     */
+    @JsonProperty(value = "properties.disallowed")
+    private DisallowedConfiguration disallowed;
+
+    /**
+     * The features property.
+     */
+    @JsonProperty(value = "properties.features")
+    private List<VirtualMachineImageFeature> features;
 
     /**
      * Get the plan value.
@@ -149,6 +164,46 @@ public class VirtualMachineImageInner extends VirtualMachineImageResourceInner {
      */
     public VirtualMachineImageInner withHyperVGeneration(HyperVGenerationTypes hyperVGeneration) {
         this.hyperVGeneration = hyperVGeneration;
+        return this;
+    }
+
+    /**
+     * Get specifies disallowed configuration for the VirtualMachine created from the image.
+     *
+     * @return the disallowed value
+     */
+    public DisallowedConfiguration disallowed() {
+        return this.disallowed;
+    }
+
+    /**
+     * Set specifies disallowed configuration for the VirtualMachine created from the image.
+     *
+     * @param disallowed the disallowed value to set
+     * @return the VirtualMachineImageInner object itself.
+     */
+    public VirtualMachineImageInner withDisallowed(DisallowedConfiguration disallowed) {
+        this.disallowed = disallowed;
+        return this;
+    }
+
+    /**
+     * Get the features value.
+     *
+     * @return the features value
+     */
+    public List<VirtualMachineImageFeature> features() {
+        return this.features;
+    }
+
+    /**
+     * Set the features value.
+     *
+     * @param features the features value to set
+     * @return the VirtualMachineImageInner object itself.
+     */
+    public VirtualMachineImageInner withFeatures(List<VirtualMachineImageFeature> features) {
+        this.features = features;
         return this;
     }
 

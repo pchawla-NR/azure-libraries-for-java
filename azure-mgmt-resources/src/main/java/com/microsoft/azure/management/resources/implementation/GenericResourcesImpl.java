@@ -6,6 +6,7 @@
 
 package com.microsoft.azure.management.resources.implementation;
 
+import com.microsoft.azure.Page;
 import com.microsoft.azure.PagedList;
 import com.microsoft.azure.management.resources.GenericResource;
 import com.microsoft.azure.management.resources.GenericResources;
@@ -14,6 +15,7 @@ import com.microsoft.azure.management.resources.ResourceGroup;
 import com.microsoft.azure.management.resources.ResourcesMoveInfo;
 import com.microsoft.azure.management.resources.fluentcore.arm.ResourceUtils;
 import com.microsoft.azure.management.resources.fluentcore.arm.collection.implementation.GroupableResourcesImpl;
+import com.microsoft.azure.management.resources.fluentcore.utils.PagedListConverter;
 import com.microsoft.azure.management.resources.fluentcore.utils.Utils;
 import com.microsoft.rest.ServiceCallback;
 import com.microsoft.rest.ServiceFuture;
@@ -35,29 +37,37 @@ final class GenericResourcesImpl
         ResourceManager>
     implements GenericResources {
 
-    GenericResourcesImpl(ResourceManager resourceManager) {
+    private PagedListConverter<GenericResourceExpandedInner, GenericResource> converter;
+
+    GenericResourcesImpl(final ResourceManager resourceManager) {
         super(resourceManager.inner().resources(), resourceManager);
+        converter = new PagedListConverter<GenericResourceExpandedInner, GenericResource>() {
+            @Override
+            public Observable<GenericResource> typeConvertAsync(GenericResourceExpandedInner inner) {
+                return Observable.just((GenericResource) new GenericResourceImpl(inner.name(), inner, manager()));
+            }
+        };
     }
 
     @Override
     public PagedList<GenericResource> list() {
-        return wrapList(this.manager().inner().resources().list());
+        return converter.convert(this.inner().list());
     }
 
     @Override
     public PagedList<GenericResource> listByResourceGroup(String groupName) {
-        return wrapList(this.manager().inner().resources().listByResourceGroup(groupName));
+        return converter.convert(this.manager().inner().resources().listByResourceGroup(groupName));
     }
 
     @Override
     public PagedList<GenericResource> listByTag(String resourceGroupName, String tagName, String tagValue) {
-        return wrapList(this.manager().inner().resources().listByResourceGroup(resourceGroupName,
+        return converter.convert(this.manager().inner().resources().listByResourceGroup(resourceGroupName,
                 Utils.createOdataFilterForTags(tagName, tagValue), null, null));
     }
 
     @Override
     public Observable<GenericResource> listByTagAsync(String resourceGroupName, String tagName, String tagValue) {
-        return wrapPageAsync(this.manager().inner().resources().listByResourceGroupAsync(resourceGroupName,
+        return convert(this.manager().inner().resources().listByResourceGroupAsync(resourceGroupName,
                 Utils.createOdataFilterForTags(tagName, tagValue), null, null));
     }
 
@@ -82,16 +92,67 @@ final class GenericResourcesImpl
 
     @Override
     public boolean checkExistenceById(String id) {
-        String apiVersion = getApiVersionFromId(id).toBlocking().single();
+        String apiVersion = getApiVersionFromIdAsync(id).toBlocking().single();
+        return this.checkExistenceById(id, apiVersion);
+    }
+
+    @Override
+    public boolean checkExistenceById(String id, String apiVersion) {
         return this.inner().checkExistenceById(id, apiVersion);
     }
 
     @Override
-    public GenericResource getById(String id) {
-        Provider provider = this.manager().providers().getByName(ResourceUtils.resourceProviderFromResourceId(id));
-        String apiVersion = ResourceUtils.defaultApiVersion(id, provider);
-        GenericResourceImpl genericResource = wrapModel(this.inner().getById(id, apiVersion));
-        return genericResource == null ? null : genericResource.withApiVersion(apiVersion);
+    public Observable<GenericResource> getByIdAsync(final String id) {
+        final GenericResourcesImpl self = this;
+        return this.getApiVersionFromIdAsync(id)
+                .flatMap(new Func1<String, Observable<GenericResource>>() {
+                    @Override
+                    public Observable<GenericResource> call(String s) {
+                        return self.getByIdAsync(id, s);
+                    }
+                });
+    }
+
+    @Override
+    public Completable deleteByIdAsync(final String id) {
+        final ResourcesInner inner = this.inner();
+        return this.getApiVersionFromIdAsync(id)
+                .flatMap(new Func1<String, Observable<Void>>() {
+                    @Override
+                    public Observable<Void> call(String apiVersion) {
+                        return inner.deleteByIdAsync(id, apiVersion);
+                    }
+                }).toCompletable();
+    }
+
+    @Override
+    public void deleteById(String id, String apiVersion) {
+        this.deleteByIdAsync(id, apiVersion).await();
+    }
+
+    @Override
+    public Completable deleteByIdAsync(String id, String apiVersion) {
+        return this.inner().deleteByIdAsync(id, apiVersion).toCompletable();
+    }
+
+    @Override
+    public GenericResource getById(String id, String apiVersion) {
+        return this.getByIdAsync(id, apiVersion).toBlocking().last();
+    }
+
+    @Override
+    public Observable<GenericResource> getByIdAsync(String id, final String apiVersion) {
+        return this.inner().getByIdAsync(id, apiVersion)
+                .map(new Func1<GenericResourceInner, GenericResource>() {
+                    @Override
+                    public GenericResource call(GenericResourceInner genericResourceInner) {
+                        GenericResourceImpl genericResource = wrapModel(genericResourceInner);
+                        if (genericResource != null) {
+                            genericResource.withApiVersion(apiVersion);
+                        }
+                        return genericResource;
+                    }
+                });
     }
 
     @Override
@@ -184,6 +245,21 @@ final class GenericResourcesImpl
     }
 
     @Override
+    public void delete(String resourceGroupName, String resourceProviderNamespace, String parentResourcePath, String resourceType, String resourceName, String apiVersion, boolean forceDeletion) {
+        deleteAsync(resourceGroupName, resourceProviderNamespace, parentResourcePath, resourceType, resourceName, apiVersion, forceDeletion).await();
+    }
+
+    @Override
+    public Completable deleteAsync(String resourceGroupName, String resourceProviderNamespace, String parentResourcePath, String resourceType, String resourceName, String apiVersion, boolean forceDeletion) {
+        return this.inner().deleteAsync(resourceGroupName, resourceProviderNamespace, parentResourcePath, resourceType, resourceName, apiVersion, forceDeletion).toCompletable();
+    }
+
+    @Override
+    public ServiceFuture<Void> deleteAsync(String resourceGroupName, String resourceProviderNamespace, String parentResourcePath, String resourceType, String resourceName, String apiVersion, boolean forceDeletion, ServiceCallback<Void> callback) {
+        return ServiceFuture.fromBody(deleteAsync(resourceGroupName, resourceProviderNamespace, parentResourcePath, resourceType, resourceName, apiVersion, forceDeletion), callback);
+    }
+
+    @Override
     protected GenericResourceImpl wrapModel(String id) {
         return new GenericResourceImpl(id, new GenericResourceInner(), this.manager())
                 .withExistingResourceGroup(ResourceUtils.groupFromResourceId(id))
@@ -216,19 +292,7 @@ final class GenericResourcesImpl
         throw new UnsupportedOperationException("Delete just by resource group and name is not supported. Please use other overloads.");
     }
 
-    @Override
-    public Completable deleteByIdAsync(final String id) {
-       final ResourcesInner inner = this.inner();
-        return getApiVersionFromId(id)
-                .flatMap(new Func1<String, Observable<Void>>() {
-                    @Override
-                    public Observable<Void> call(String apiVersion) {
-                        return inner.deleteByIdAsync(id, apiVersion);
-                    }
-                }).toCompletable();
-    }
-
-    private Observable<String> getApiVersionFromId(final String id) {
+    private Observable<String> getApiVersionFromIdAsync(final String id) {
         return this.manager().providers().getByNameAsync(ResourceUtils.resourceProviderFromResourceId(id))
                 .map(new Func1<Provider, String>() {
                     @Override
@@ -240,11 +304,25 @@ final class GenericResourcesImpl
 
     @Override
     public Observable<GenericResource> listAsync() {
-        return wrapPageAsync(this.inner().listAsync());
+        return convert(this.inner().listAsync());
     }
 
     @Override
     public Observable<GenericResource> listByResourceGroupAsync(String resourceGroupName) {
-        return wrapPageAsync(this.manager().inner().resources().listByResourceGroupAsync(resourceGroupName));
+        return convert(this.manager().inner().resources().listByResourceGroupAsync(resourceGroupName));
+    }
+
+    private Observable<GenericResource> convert(Observable<Page<GenericResourceExpandedInner>> inners) {
+        return inners.flatMap(new Func1<Page<GenericResourceExpandedInner>, Observable<GenericResourceExpandedInner>>() {
+            @Override
+            public Observable<GenericResourceExpandedInner> call(Page<GenericResourceExpandedInner> genericResourceExpandedInnerPage) {
+                return Observable.from(genericResourceExpandedInnerPage.items());
+            }
+        }).map(new Func1<GenericResourceExpandedInner, GenericResource>() {
+            @Override
+            public GenericResource call(GenericResourceExpandedInner inner) {
+                return wrapModel(inner);
+            }
+        });
     }
 }

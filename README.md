@@ -1,13 +1,18 @@
 [![Build Status](https://dev.azure.com/azure-sdk/public/_apis/build/status/fluentJava/Azure.azure-libraries-for-java?branchName=master)](https://dev.azure.com/azure-sdk/public/_build/latest?definitionId=608&branchName=master)
-[![Build Status](https://travis-ci.org/Azure/azure-libraries-for-java.svg?style=flat-square&label=build&branch=master)](https://travis-ci.org/Azure/azure-libraries-for-java)
 
-# Try the Next-Generation Azure Management SDK for Java now
+# This Repo is in Maintenance Mode
 
-A new set of Azure Management Libraries for Java that follows the [Azure SDK Design Guidelines for Java](https://azure.github.io/azure-sdk/java_introduction.html) are now in public preview. If you are interested in the new generation SDK for Java, please find more details [here](https://github.com/Azure/azure-sdk-for-java/tree/master/sdk/management).
+As our development focus has shifted to our next-generation Azure management libraries, this repository is currently in **maintenance mode**. We will continue to monitor this repository and make our best to effort to support any feature asks / bug fixes, however, please expect that this repository will **gradually be phased out (and eventually deprecated)** and work will be more focused on the [new libraries](https://aka.ms/azsdk/java/mgmt).
+
+Going forward, We highly encourage you to [try out those new management libraries](http://aka.ms/azsdk/java/mgmt) as they are now Generally Available (GA) and ready for production uses. These new libraries provide a higher-level, object-oriented API for managing Azure resources, that is optimized for ease of use, succinctness and consistency. You can find the list of new packages **[on this page](https://azure.github.io/azure-sdk/releases/latest/java.html)**.
+
+**If you are interested in learning how to use the new libraries for Azure resource management, please [visit here](https://aka.ms/azsdk/java/mgmt)**. We have also prepared **[plenty of code samples](https://github.com/Azure/azure-sdk-for-java/blob/master/sdk/resourcemanager/docs/SAMPLE.md)** as well as **[migraton guide](https://github.com/Azure/azure-sdk-for-java/blob/master/sdk/resourcemanager/docs/MIGRATION_GUIDE.md)** in case you are upgrading.
+
+New Management libraries can be identified by namespaces that start with `azure-resourcemanager`, e.g. `azure-resourcemanager-compute`. They follow the [Azure SDK Design Guidelines for Java](https://azure.github.io/azure-sdk/java/guidelines/) which aims to provide consistent, approachable, idiomatic, diagnosable, and dependable experience for developers.
 
 # Azure Management Libraries for Java
 
-This README is based on the released stable version (1.35.1). If you are looking for other releases, see [More Information](#more-information).
+This README is based on the released stable version (1.41.2). If you are looking for other releases, see [More Information](#more-information).
 
 The Azure Management Libraries for Java is a higher-level, object-oriented API for *managing* Azure resources, that is optimized for ease of use, succinctness and consistency.
 
@@ -29,7 +34,7 @@ If you are looking for Java client libraries for *consuming* (rather than *manag
 * [More information](#more-information)
 
 ## Feature Availability and Road Map
-:triangular_flag_on_post: *as of Version 1.35.1*
+:triangular_flag_on_post: *as of Version 1.41.2*
 
 <table>
   <tr>
@@ -621,18 +626,18 @@ SqlDatabase database = sqlServer.databases().define("myNewDatabase")
 
 ### Use single library
 
-For instance, if you only need azure-mgmt-appservice library from 1.35.1, and wish to limit the dependencies, using following dependency instead in POM.
+For instance, if you only need azure-mgmt-appservice library from 1.41.2, and wish to limit the dependencies, using following dependency instead in POM.
 
 ```xml
 <dependency>
     <groupId>com.microsoft.azure</groupId>
     <artifactId>azure-mgmt-appservice</artifactId>
-    <version>1.35.1</version>
+    <version>1.41.2</version>
 </dependency>
 <dependency>
     <groupId>com.microsoft.azure</groupId>
     <artifactId>azure-client-authentication</artifactId>
-    <version>1.7.0</version>
+    <version>1.7.12</version>
 </dependency>
 ```
 
@@ -658,13 +663,13 @@ WebApp webApp = appServiceClient.webApps()
 
 ### Latest stable release
 
-If you are using released builds from 1.35.1, add the following to your POM file:
+If you are using released builds from 1.41.2, add the following to your POM file:
 
 ```xml
 <dependency>
     <groupId>com.microsoft.azure</groupId>
     <artifactId>azure</artifactId>
-    <version>1.35.1</version>
+    <version>1.41.2</version>
 </dependency>
 ```
 
@@ -691,22 +696,7 @@ If you are using snapshots builds for this repo, add the following repository an
 <dependency>
     <groupId>com.microsoft.azure</groupId>
     <artifactId>azure</artifactId>
-    <version>1.35.2-SNAPSHOT</version>
-</dependency>
-<dependency>
-    <groupId>com.microsoft.azure</groupId>
-    <artifactId>azure-client-runtime</artifactId>
-    <version>1.6.5-SNAPSHOT</version>
-</dependency>
-<dependency>
-    <groupId>com.microsoft.azure</groupId>
-    <artifactId>azure-client-authentication</artifactId>
-    <version>1.6.5-SNAPSHOT</version>
-</dependency>
-<dependency>
-    <groupId>com.microsoft.rest</groupId>
-    <artifactId>client-runtime</artifactId>
-    <version>1.6.5-SNAPSHOT</version>
+    <version>1.41.3-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -718,7 +708,7 @@ If you are using snapshots builds for this repo, add the following repository an
 
 ## Upgrading from older versions
 
-If you are migrating your code from 1.35.0 to 1.35.1, you can use these release notes for [preparing your code for 1.35.1 from 1.35.0](./notes/prepare-for-1.35.1.md).
+If you are migrating your code from 1.41.1 to 1.41.2, you can use these release notes for [preparing your code for 1.41.2 from 1.41.1](./notes/prepare-for-1.41.2.md).
 
 In general, Azure Libraries for Java follow [semantic versioning](http://semver.org/), so user code should continue working in a compatible fashion between minor versions of the same major version release train, with the following caveats:
 
@@ -751,6 +741,20 @@ If you would like to become an active contributor to this project please follow 
 
 | Version           | SHA1                                                                                      | Remarks                                               |
 |-------------------|-------------------------------------------------------------------------------------------|-------------------------------------------------------|
+| 1.41.2       | [1.41.2](https://github.com/Azure/azure-libraries-for-java/tree/v1.41.2)               | Tagged release for 1.41.2 version of Azure management libraries |
+| 1.41.1       | [1.41.1](https://github.com/Azure/azure-libraries-for-java/tree/v1.41.1)               | Tagged release for 1.41.1 version of Azure management libraries |
+| 1.41.0       | [1.41.0](https://github.com/Azure/azure-libraries-for-java/tree/v1.41.0)               | Tagged release for 1.41.0 version of Azure management libraries |
+| 1.40.0       | [1.40.0](https://github.com/Azure/azure-libraries-for-java/tree/v1.40.0)               | Tagged release for 1.40.0 version of Azure management libraries |
+| 1.39.1       | [1.39.1](https://github.com/Azure/azure-libraries-for-java/tree/v1.39.1)               | Tagged release for 1.39.1 version of Azure management libraries |
+| 1.39.0       | [1.39.0](https://github.com/Azure/azure-libraries-for-java/tree/v1.39.0)               | Tagged release for 1.39.0 version of Azure management libraries |
+| 1.38.1       | [1.38.1](https://github.com/Azure/azure-libraries-for-java/tree/v1.38.1)               | Tagged release for 1.38.1 version of Azure management libraries |
+| 1.38.0       | [1.38.0](https://github.com/Azure/azure-libraries-for-java/tree/v1.38.0)               | Tagged release for 1.38.0 version of Azure management libraries |
+| 1.37.1       | [1.37.1](https://github.com/Azure/azure-libraries-for-java/tree/v1.37.1)               | Tagged release for 1.37.1 version of Azure management libraries |
+| 1.37.0       | [1.37.0](https://github.com/Azure/azure-libraries-for-java/tree/v1.37.0)               | Tagged release for 1.37.0 version of Azure management libraries |
+| 1.36.3       | [1.36.3](https://github.com/Azure/azure-libraries-for-java/tree/v1.36.3)               | Tagged release for 1.36.3 version of Azure management libraries |
+| 1.36.2       | [1.36.2](https://github.com/Azure/azure-libraries-for-java/tree/v1.36.2)               | Tagged release for 1.36.2 version of Azure management libraries |
+| 1.36.1       | [1.36.1](https://github.com/Azure/azure-libraries-for-java/tree/v1.36.1)               | Tagged release for 1.36.1 version of Azure management libraries |
+| 1.36.0       | [1.36.0](https://github.com/Azure/azure-libraries-for-java/tree/v1.36.0)               | Tagged release for 1.36.0 version of Azure management libraries |
 | 1.35.1       | [1.35.1](https://github.com/Azure/azure-libraries-for-java/tree/v1.35.1)               | Tagged release for 1.35.1 version of Azure management libraries |
 | 1.35.0       | [1.35.0](https://github.com/Azure/azure-libraries-for-java/tree/v1.35.0)               | Tagged release for 1.35.0 version of Azure management libraries |
 | 1.34.0       | [1.34.0](https://github.com/Azure/azure-libraries-for-java/tree/v1.34.0)               | Tagged release for 1.34.0 version of Azure management libraries |

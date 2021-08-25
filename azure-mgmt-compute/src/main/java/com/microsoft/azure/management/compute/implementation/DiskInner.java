@@ -10,14 +10,17 @@ package com.microsoft.azure.management.compute.implementation;
 
 import java.util.List;
 import com.microsoft.azure.management.compute.DiskSku;
+import com.microsoft.azure.management.compute.ExtendedLocation;
 import org.joda.time.DateTime;
 import com.microsoft.azure.management.compute.OperatingSystemTypes;
 import com.microsoft.azure.management.compute.HyperVGeneration;
+import com.microsoft.azure.management.compute.PurchasePlan;
 import com.microsoft.azure.management.compute.CreationData;
 import com.microsoft.azure.management.compute.EncryptionSettingsCollection;
 import com.microsoft.azure.management.compute.DiskState;
 import com.microsoft.azure.management.compute.Encryption;
 import com.microsoft.azure.management.compute.ShareInfoElement;
+import com.microsoft.azure.management.compute.NetworkAccessPolicy;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microsoft.rest.serializer.JsonFlatten;
 import com.microsoft.azure.Resource;
@@ -54,6 +57,13 @@ public class DiskInner extends Resource {
     private List<String> zones;
 
     /**
+     * The extended location where the disk will be created. Extended location
+     * cannot be changed.
+     */
+    @JsonProperty(value = "extendedLocation")
+    private ExtendedLocation extendedLocation;
+
+    /**
      * The time when the disk was created.
      */
     @JsonProperty(value = "properties.timeCreated", access = JsonProperty.Access.WRITE_ONLY)
@@ -71,6 +81,14 @@ public class DiskInner extends Resource {
      */
     @JsonProperty(value = "properties.hyperVGeneration")
     private HyperVGeneration hyperVGeneration;
+
+    /**
+     * Purchase plan information for the the image from which the OS disk was
+     * created. E.g. - {name: 2019-Datacenter, publisher:
+     * MicrosoftWindowsServer, product: WindowsServer}.
+     */
+    @JsonProperty(value = "properties.purchasePlan")
+    private PurchasePlan purchasePlan;
 
     /**
      * Disk source information. CreationData information cannot be changed
@@ -149,7 +167,7 @@ public class DiskInner extends Resource {
      * The state of the disk. Possible values include: 'Unattached',
      * 'Attached', 'Reserved', 'ActiveSAS', 'ReadyToUpload', 'ActiveUpload'.
      */
-    @JsonProperty(value = "properties.diskState", access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty(value = "properties.diskState")
     private DiskState diskState;
 
     /**
@@ -174,6 +192,34 @@ public class DiskInner extends Resource {
      */
     @JsonProperty(value = "properties.shareInfo", access = JsonProperty.Access.WRITE_ONLY)
     private List<ShareInfoElement> shareInfo;
+
+    /**
+     * Possible values include: 'AllowAll', 'AllowPrivate', 'DenyAll'.
+     */
+    @JsonProperty(value = "properties.networkAccessPolicy")
+    private NetworkAccessPolicy networkAccessPolicy;
+
+    /**
+     * ARM id of the DiskAccess resource for using private endpoints on disks.
+     */
+    @JsonProperty(value = "properties.diskAccessId")
+    private String diskAccessId;
+
+    /**
+     * Performance tier of the disk (e.g, P4, S10) as described here:
+     * https://azure.microsoft.com/en-us/pricing/details/managed-disks/. Does
+     * not apply to Ultra disks.
+     */
+    @JsonProperty(value = "properties.tier")
+    private String tier;
+
+    /**
+     * Set to true to enable bursting beyond the provisioned performance target
+     * of the disk. Bursting is disabled by default. Does not apply to Ultra
+     * disks.
+     */
+    @JsonProperty(value = "properties.burstingEnabled")
+    private Boolean burstingEnabled;
 
     /**
      * Get a relative URI containing the ID of the VM that has the disk attached.
@@ -234,6 +280,26 @@ public class DiskInner extends Resource {
     }
 
     /**
+     * Get the extended location where the disk will be created. Extended location cannot be changed.
+     *
+     * @return the extendedLocation value
+     */
+    public ExtendedLocation extendedLocation() {
+        return this.extendedLocation;
+    }
+
+    /**
+     * Set the extended location where the disk will be created. Extended location cannot be changed.
+     *
+     * @param extendedLocation the extendedLocation value to set
+     * @return the DiskInner object itself.
+     */
+    public DiskInner withExtendedLocation(ExtendedLocation extendedLocation) {
+        this.extendedLocation = extendedLocation;
+        return this;
+    }
+
+    /**
      * Get the time when the disk was created.
      *
      * @return the timeCreated value
@@ -279,6 +345,26 @@ public class DiskInner extends Resource {
      */
     public DiskInner withHyperVGeneration(HyperVGeneration hyperVGeneration) {
         this.hyperVGeneration = hyperVGeneration;
+        return this;
+    }
+
+    /**
+     * Get purchase plan information for the the image from which the OS disk was created. E.g. - {name: 2019-Datacenter, publisher: MicrosoftWindowsServer, product: WindowsServer}.
+     *
+     * @return the purchasePlan value
+     */
+    public PurchasePlan purchasePlan() {
+        return this.purchasePlan;
+    }
+
+    /**
+     * Set purchase plan information for the the image from which the OS disk was created. E.g. - {name: 2019-Datacenter, publisher: MicrosoftWindowsServer, product: WindowsServer}.
+     *
+     * @param purchasePlan the purchasePlan value to set
+     * @return the DiskInner object itself.
+     */
+    public DiskInner withPurchasePlan(PurchasePlan purchasePlan) {
+        this.purchasePlan = purchasePlan;
         return this;
     }
 
@@ -459,6 +545,17 @@ public class DiskInner extends Resource {
     }
 
     /**
+     * Set the state of the disk. Possible values include: 'Unattached', 'Attached', 'Reserved', 'ActiveSAS', 'ReadyToUpload', 'ActiveUpload'.
+     *
+     * @param diskState the diskState value to set
+     * @return the DiskInner object itself.
+     */
+    public DiskInner withDiskState(DiskState diskState) {
+        this.diskState = diskState;
+        return this;
+    }
+
+    /**
      * Get encryption property can be used to encrypt data at rest with customer managed keys or platform managed keys.
      *
      * @return the encryption value
@@ -505,6 +602,86 @@ public class DiskInner extends Resource {
      */
     public List<ShareInfoElement> shareInfo() {
         return this.shareInfo;
+    }
+
+    /**
+     * Get possible values include: 'AllowAll', 'AllowPrivate', 'DenyAll'.
+     *
+     * @return the networkAccessPolicy value
+     */
+    public NetworkAccessPolicy networkAccessPolicy() {
+        return this.networkAccessPolicy;
+    }
+
+    /**
+     * Set possible values include: 'AllowAll', 'AllowPrivate', 'DenyAll'.
+     *
+     * @param networkAccessPolicy the networkAccessPolicy value to set
+     * @return the DiskInner object itself.
+     */
+    public DiskInner withNetworkAccessPolicy(NetworkAccessPolicy networkAccessPolicy) {
+        this.networkAccessPolicy = networkAccessPolicy;
+        return this;
+    }
+
+    /**
+     * Get aRM id of the DiskAccess resource for using private endpoints on disks.
+     *
+     * @return the diskAccessId value
+     */
+    public String diskAccessId() {
+        return this.diskAccessId;
+    }
+
+    /**
+     * Set aRM id of the DiskAccess resource for using private endpoints on disks.
+     *
+     * @param diskAccessId the diskAccessId value to set
+     * @return the DiskInner object itself.
+     */
+    public DiskInner withDiskAccessId(String diskAccessId) {
+        this.diskAccessId = diskAccessId;
+        return this;
+    }
+
+    /**
+     * Get performance tier of the disk (e.g, P4, S10) as described here: https://azure.microsoft.com/en-us/pricing/details/managed-disks/. Does not apply to Ultra disks.
+     *
+     * @return the tier value
+     */
+    public String tier() {
+        return this.tier;
+    }
+
+    /**
+     * Set performance tier of the disk (e.g, P4, S10) as described here: https://azure.microsoft.com/en-us/pricing/details/managed-disks/. Does not apply to Ultra disks.
+     *
+     * @param tier the tier value to set
+     * @return the DiskInner object itself.
+     */
+    public DiskInner withTier(String tier) {
+        this.tier = tier;
+        return this;
+    }
+
+    /**
+     * Get set to true to enable bursting beyond the provisioned performance target of the disk. Bursting is disabled by default. Does not apply to Ultra disks.
+     *
+     * @return the burstingEnabled value
+     */
+    public Boolean burstingEnabled() {
+        return this.burstingEnabled;
+    }
+
+    /**
+     * Set set to true to enable bursting beyond the provisioned performance target of the disk. Bursting is disabled by default. Does not apply to Ultra disks.
+     *
+     * @param burstingEnabled the burstingEnabled value to set
+     * @return the DiskInner object itself.
+     */
+    public DiskInner withBurstingEnabled(Boolean burstingEnabled) {
+        this.burstingEnabled = burstingEnabled;
+        return this;
     }
 
 }

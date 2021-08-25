@@ -10,6 +10,7 @@ import com.microsoft.azure.PagedList;
 import com.microsoft.azure.management.network.LoadBalancer;
 import com.microsoft.azure.management.network.Network;
 import com.microsoft.azure.management.resources.ResourceGroup;
+import com.microsoft.azure.management.resources.core.TestUtilities;
 import com.microsoft.azure.management.resources.fluentcore.arm.Region;
 import com.microsoft.azure.management.resources.fluentcore.utils.SdkContext;
 import com.microsoft.rest.RestClient;
@@ -177,7 +178,7 @@ public class VirtualMachineScaleSetManagedDiskOperationsTests extends ComputeMan
     @Test
     public void canCreateVirtualMachineScaleSetFromCustomImageWithManagedDisk() throws Exception {
         final String userName = "tirekicker";
-        final String password = "12NewPA$$w0rd!";
+        final String password = TestUtilities.createPassword();
         final String publicIpDnsLabel = generateRandomResourceName("pip", 10);
         final String customImageName = generateRandomResourceName("img", 10);
         final String vmssName = generateRandomResourceName("vmss", 10);
@@ -205,7 +206,7 @@ public class VirtualMachineScaleSetManagedDiskOperationsTests extends ComputeMan
                     .withNewVhd(50)
                     .withLun(2)
                     .attach()
-                .withSize(VirtualMachineSizeTypes.STANDARD_D3_V2)
+                .withSize(VirtualMachineSizeTypes.fromString("Standard_D2a_v4"))
                 .create();
 
         Assert.assertNotNull(vm);
@@ -214,7 +215,7 @@ public class VirtualMachineScaleSetManagedDiskOperationsTests extends ComputeMan
         //
         SdkContext.sleep(40 * 1000);
 
-        deprovisionAgentInLinuxVM(vm.getPrimaryPublicIPAddress().fqdn(), 22, userName, password);
+        deprovisionAgentInLinuxVM(vm);
         vm.deallocate();
         vm.generalize();
 

@@ -6,15 +6,22 @@
 
 package com.microsoft.azure.management.appservice.implementation;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.google.common.base.Joiner;
 import com.google.common.io.ByteStreams;
-import com.microsoft.azure.CloudException;
+import com.google.common.reflect.TypeToken;
+import com.microsoft.azure.AzureResponseBuilder;
+import com.microsoft.azure.management.appservice.DeployType;
 import com.microsoft.azure.management.appservice.WebAppBase;
+import com.microsoft.rest.RestClient;
+import com.microsoft.rest.RestException;
+import com.microsoft.rest.ServiceResponse;
+import com.microsoft.rest.ServiceResponseBuilder;
+import com.microsoft.rest.protocol.ResponseBuilder;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import okio.BufferedSource;
+import retrofit2.Response;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
@@ -32,13 +39,17 @@ import rx.functions.Func2;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.SocketTimeoutException;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
  * A client which interacts with Kudu service.
  */
 class KuduClient {
-    private KuduService service;
+    private final RestClient restClient;
+    private final KuduService service;
 
     KuduClient(WebAppBase webAppBase) {
         if (webAppBase.defaultHostName() == null) {
@@ -49,11 +60,12 @@ class KuduClient {
                 .replace("https://", "");
         String[] parts = host.split("\\.", 2);
         host = Joiner.on('.').join(parts[0], "scm", parts[1]);
-        service = webAppBase.manager().restClient().newBuilder()
+        restClient = webAppBase.manager().restClient().newBuilder()
                 .withBaseUrl("https://" + host)
                 .withConnectionTimeout(3, TimeUnit.MINUTES)
                 .withReadTimeout(3, TimeUnit.MINUTES)
-                .build()
+                .build();
+        service = restClient
                 .retrofit().create(KuduService.class);
     }
 
@@ -85,13 +97,19 @@ class KuduClient {
 
         @Headers({ "Content-Type: application/octet-stream", "x-ms-logging-context: com.microsoft.azure.management.appservice.WebApps warDeploy", "x-ms-body-logging: false" })
         @POST("api/wardeploy")
-        @Streaming
-        Observable<Void> warDeploy(@Body RequestBody warFile, @Query("name") String appName);
+        Observable<Response<ResponseBody>> warDeploy(@Body RequestBody warFile, @Query("name") String appName);
 
         @Headers({ "Content-Type: application/octet-stream", "x-ms-logging-context: com.microsoft.azure.management.appservice.WebApps zipDeploy", "x-ms-body-logging: false" })
         @POST("api/zipdeploy")
-        @Streaming
-        Observable<Void> zipDeploy(@Body RequestBody zipFile);
+        Observable<Response<ResponseBody>> zipDeploy(@Body RequestBody zipFile);
+
+        @Headers({ "Content-Type: application/octet-stream", "x-ms-logging-context: com.microsoft.azure.management.appservice.WebApps publish", "x-ms-body-logging: false" })
+        @POST("api/publish")
+        Observable<Response<ResponseBody>> deploy(@Body RequestBody file, @Query("type") DeployType type, @Query("path") String path, @Query("restart") Boolean restart, @Query("clean") Boolean clean);
+
+        @Headers({ "x-ms-logging-context: com.microsoft.azure.management.appservice.WebApps settings" })
+        @GET("api/settings")
+        Observable<Response<ResponseBody>> settings();
     }
 
     Observable<String> streamApplicationLogsAsync() {
@@ -168,7 +186,9 @@ class KuduClient {
     Completable warDeployAsync(InputStream warFile, String appName) {
         try {
             RequestBody body = RequestBody.create(MediaType.parse("application/octet-stream"), ByteStreams.toByteArray(warFile));
-            return getCompletable(service.warDeploy(body, appName));
+            Observable<ServiceResponse<Void>> response =
+                    retryOnError(handleResponse(service.warDeploy(body, appName)));
+            return response.toCompletable();
         } catch (IOException e) {
             return Completable.error(e);
         }
@@ -177,35 +197,106 @@ class KuduClient {
     Completable zipDeployAsync(InputStream zipFile) {
         try {
             RequestBody body = RequestBody.create(MediaType.parse("application/octet-stream"), ByteStreams.toByteArray(zipFile));
-            return getCompletable(service.zipDeploy(body));
+            Observable<ServiceResponse<Void>> response =
+                    retryOnError(handleResponse(service.zipDeploy(body)));
+            return response.toCompletable();
         } catch (IOException e) {
             return Completable.error(e);
         }
     }
 
-    private Completable getCompletable(Observable<Void> observable) {
-        return observable
-                .toCompletable()
-                .retryWhen(new Func1<Observable<? extends Throwable>, Observable<?>>() {
+    Completable deployAsync(DeployType type, InputStream file, String path, Boolean restart, Boolean clean) {
+        try {
+            RequestBody body = RequestBody.create(MediaType.parse("application/octet-stream"), ByteStreams.toByteArray(file));
+            Observable<ServiceResponse<Void>> response =
+                    retryOnError(handleResponse(service.deploy(body, type, path, restart, clean)));
+            return response.toCompletable();
+        } catch (IOException e) {
+            return Completable.error(e);
+        }
+    }
+
+    Observable<Map<String, String>> settings() {
+        return retryOnError(service.settings().flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<Map<String, String>>>>() {
+            @Override
+            public Observable<ServiceResponse<Map<String, String>>> call(Response<ResponseBody> response) {
+                try {
+                    ResponseBuilder<Map<String, String>, RestException> responseBuilder = restClient
+                            .responseBuilderFactory().newInstance(restClient.serializerAdapter());
+                    // set throwOnGet404 to true
+                    if (responseBuilder instanceof AzureResponseBuilder) {
+                        ((AzureResponseBuilder<Map<String, String>, RestException>) responseBuilder).withThrowOnGet404(true);
+                    } else if (responseBuilder instanceof ServiceResponseBuilder) {
+                        ((ServiceResponseBuilder<Map<String, String>, RestException>) responseBuilder).withThrowOnGet404(true);
+                    }
+
+                    ServiceResponse<Map<String, String>> clientResponse = responseBuilder
+                            .register(200, new TypeToken<Map<String, String>>() { }.getType())
+                            .registerError(RestException.class)
+                            .build(response);
+                    return Observable.just(clientResponse);
+                } catch (Throwable t) {
+                    return Observable.error(t);
+                }
+            }
+        }).map(new Func1<ServiceResponse<Map<String, String>>, Map<String, String>>() {
+            @Override
+            public Map<String, String> call(ServiceResponse<Map<String, String>> response) {
+                return response.body();
+            }
+        }));
+    }
+
+    private Observable<ServiceResponse<Void>> handleResponse(Observable<Response<ResponseBody>> observable) {
+        return observable.flatMap(new Func1<Response<ResponseBody>, Observable<ServiceResponse<Void>>>() {
+            @Override
+            public Observable<ServiceResponse<Void>> call(Response<ResponseBody> response) {
+                try {
+                    if (response.isSuccessful()) {
+                        return Observable.just(new ServiceResponse<Void>(null, response));
+                    } else {
+                        String errorMessage = "Status code " + response.code();
+                        if (response.errorBody() != null
+                                && response.errorBody().contentType() != null
+                                && Objects.equals("text", response.errorBody().contentType().type())) {
+                            String errorBody = response.errorBody().string();
+                            if (!errorBody.isEmpty()) {
+                                errorMessage = errorBody;
+                            }
+                        }
+                        return Observable.error(new RestException(errorMessage, response));
+                    }
+                } catch (Throwable t) {
+                    return Observable.error(t);
+                }
+            }
+        });
+    }
+
+    private <T> Observable<T> retryOnError(Observable<T> observable) {
+        final int retryCount = 5 + 1;   // retryCount is 5, last 1 is guard
+        return observable.retryWhen(new Func1<Observable<? extends Throwable>, Observable<?>>() {
+            @Override
+            public Observable<?> call(Observable<? extends Throwable> observable) {
+                return observable.zipWith(Observable.range(1, retryCount), new Func2<Throwable, Integer, Integer>() {
                     @Override
-                    public Observable<?> call(Observable<? extends Throwable> observable) {
-                        return observable.zipWith(Observable.range(1, 30), new Func2<Throwable, Integer, Integer>() {
-                            @Override
-                            public Integer call(Throwable throwable, Integer integer) {
-                                if (throwable instanceof CloudException
-                                        && ((CloudException) throwable).response().code() == 502 || throwable instanceof JsonParseException) {
-                                    return integer;
-                                } else {
-                                    throw Exceptions.propagate(throwable);
-                                }
-                            }
-                        }).flatMap(new Func1<Integer, Observable<?>>() {
-                            @Override
-                            public Observable<?> call(Integer i) {
-                                return Observable.timer(i, TimeUnit.SECONDS);
-                            }
-                        });
+                    public Integer call(Throwable throwable, Integer integer) {
+                        if (integer < retryCount
+                                && (throwable instanceof SocketTimeoutException
+                                || (throwable instanceof RestException
+                                && ((RestException) throwable).response().code() == 502))) {
+                            return integer;
+                        } else {
+                            throw Exceptions.propagate(throwable);
+                        }
+                    }
+                }).flatMap(new Func1<Integer, Observable<?>>() {
+                    @Override
+                    public Observable<?> call(Integer i) {
+                        return Observable.timer(i * 10, TimeUnit.SECONDS);
                     }
                 });
+            }
+        });
     }
 }

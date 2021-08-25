@@ -9,7 +9,8 @@
 package com.microsoft.azure.management.compute.implementation;
 
 import com.microsoft.azure.management.compute.EncryptionSetIdentity;
-import com.microsoft.azure.management.compute.KeyVaultAndKeyReference;
+import com.microsoft.azure.management.compute.DiskEncryptionSetType;
+import com.microsoft.azure.management.compute.KeyForDiskEncryptionSet;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microsoft.rest.serializer.JsonFlatten;
@@ -27,10 +28,17 @@ public class DiskEncryptionSetInner extends Resource {
     private EncryptionSetIdentity identity;
 
     /**
+     * Possible values include: 'EncryptionAtRestWithCustomerKey',
+     * 'EncryptionAtRestWithPlatformAndCustomerKeys'.
+     */
+    @JsonProperty(value = "properties.encryptionType")
+    private DiskEncryptionSetType encryptionType;
+
+    /**
      * The key vault key which is currently used by this disk encryption set.
      */
     @JsonProperty(value = "properties.activeKey")
-    private KeyVaultAndKeyReference activeKey;
+    private KeyForDiskEncryptionSet activeKey;
 
     /**
      * A readonly collection of key vault keys previously used by this disk
@@ -38,7 +46,7 @@ public class DiskEncryptionSetInner extends Resource {
      * there is no ongoing key rotation.
      */
     @JsonProperty(value = "properties.previousKeys", access = JsonProperty.Access.WRITE_ONLY)
-    private List<KeyVaultAndKeyReference> previousKeys;
+    private List<KeyForDiskEncryptionSet> previousKeys;
 
     /**
      * The disk encryption set provisioning state.
@@ -67,11 +75,31 @@ public class DiskEncryptionSetInner extends Resource {
     }
 
     /**
+     * Get possible values include: 'EncryptionAtRestWithCustomerKey', 'EncryptionAtRestWithPlatformAndCustomerKeys'.
+     *
+     * @return the encryptionType value
+     */
+    public DiskEncryptionSetType encryptionType() {
+        return this.encryptionType;
+    }
+
+    /**
+     * Set possible values include: 'EncryptionAtRestWithCustomerKey', 'EncryptionAtRestWithPlatformAndCustomerKeys'.
+     *
+     * @param encryptionType the encryptionType value to set
+     * @return the DiskEncryptionSetInner object itself.
+     */
+    public DiskEncryptionSetInner withEncryptionType(DiskEncryptionSetType encryptionType) {
+        this.encryptionType = encryptionType;
+        return this;
+    }
+
+    /**
      * Get the key vault key which is currently used by this disk encryption set.
      *
      * @return the activeKey value
      */
-    public KeyVaultAndKeyReference activeKey() {
+    public KeyForDiskEncryptionSet activeKey() {
         return this.activeKey;
     }
 
@@ -81,7 +109,7 @@ public class DiskEncryptionSetInner extends Resource {
      * @param activeKey the activeKey value to set
      * @return the DiskEncryptionSetInner object itself.
      */
-    public DiskEncryptionSetInner withActiveKey(KeyVaultAndKeyReference activeKey) {
+    public DiskEncryptionSetInner withActiveKey(KeyForDiskEncryptionSet activeKey) {
         this.activeKey = activeKey;
         return this;
     }
@@ -91,7 +119,7 @@ public class DiskEncryptionSetInner extends Resource {
      *
      * @return the previousKeys value
      */
-    public List<KeyVaultAndKeyReference> previousKeys() {
+    public List<KeyForDiskEncryptionSet> previousKeys() {
         return this.previousKeys;
     }
 

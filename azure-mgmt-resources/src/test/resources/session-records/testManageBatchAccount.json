@@ -288,7 +288,7 @@
     "Response" : {
       "StatusCode" : "201",
       "content-type" : "application/json; charset=utf-8",
-      "Body" : "{\"id\":\"application\",\"version\":\"app_package\",\"storageUrl\":\"https://sa1c6538809cb4c6227a.blob.core.windows.net/app-application-d2005cc206ccbfdedf2be43a200cb050c538bdb5/application-app_package-c58371ff-2d97-40fb-a917-0b0a92e7d1a2?sv=2015-04-05&sr=b&sig=rBHp236h43rBavnbkU8e%2BarN8e%2BW1ItlFULqyLHGrOE%3D&st=2017-01-24T23%3A09%3A17Z&se=2017-01-25T03%3A14%3A17Z&sp=rw\",\"storageUrlExpiry\":\"2017-01-25T03:14:17.1672637Z\",\"state\":\"pending\"}",
+      "Body" : "{\"id\":\"application\",\"version\":\"app_package\",\"storageUrl\":\"https://sa1c6538809cb4c6227a.blob.core.windows.net/app-application-d2005cc206ccbfdedf2be43a200cb050c538bdb5/application-app_package-c58371ff-2d97-40fb-a917-0b0a92e7d1a2?sv=2015-04-05&sr=b&sig=MGMT_PLACEHOLDER&st=2017-01-24T23%3A09%3A17Z&se=2017-01-25T03%3A14%3A17Z&sp=rw\",\"storageUrlExpiry\":\"2017-01-25T03:14:17.1672637Z\",\"state\":\"pending\"}",
       "x-ms-ratelimit-remaining-subscription-writes" : "1194",
       "x-ms-routing-request-id" : "WESTUS2:20170124T231416Z:b001437d-9a48-44e3-9208-649a5e28e00c",
       "request-id" : "9cc7a349-64f5-47b7-b83a-5206e094f6aa",
@@ -314,7 +314,7 @@
     "Response" : {
       "StatusCode" : "200",
       "content-type" : "application/json; charset=utf-8",
-      "Body" : "{\"accountName\":\"ba6ba546748010524139\",\"primary\":\"CY1ee55ftt1uzQpyGazBbDItBV0m4ZEBowSPAWjRUGzF7nSEPfOQPrs82fKAPtTANpunusC8cqu6RyZQxPPkFw==\",\"secondary\":\"svt7Bw1xUN1CaFwKtoB+pVm6dbKpeOOfc6Gy5ds8ZrpS9rFrk2CCslMpsjLCzWKEsiEmpg6hr09YwyF5T7zc9Q==\"}",
+      "Body" : "{\"accountName\":\"ba6ba546748010524139\",\"primary\":\"MGMT_PLACEHOLDER\",\"secondary\":\"MGMT_PLACEHOLDER\"}",
       "x-ms-ratelimit-remaining-subscription-writes" : "1193",
       "transfer-encoding" : "chunked",
       "x-ms-routing-request-id" : "WESTUS2:20170124T231416Z:9476fbc8-8ca2-44cb-a7b0-b411d5c3f4b7",
@@ -342,7 +342,7 @@
     "Response" : {
       "StatusCode" : "200",
       "content-type" : "application/json; charset=utf-8",
-      "Body" : "{\"accountName\":\"ba6ba546748010524139\",\"primary\":\"XJTB4G3uMtQCzjVUoZTLoCTu8Z3Bf+9xhME+RiwyNpEXRAUZMLXXPS5clGNBlgLenXacdzLnnKTMnc/w/QgHCg==\",\"secondary\":\"svt7Bw1xUN1CaFwKtoB+pVm6dbKpeOOfc6Gy5ds8ZrpS9rFrk2CCslMpsjLCzWKEsiEmpg6hr09YwyF5T7zc9Q==\"}",
+      "Body" : "{\"accountName\":\"ba6ba546748010524139\",\"primary\":\"MGMT_PLACEHOLDER\",\"secondary\":\"MGMT_PLACEHOLDER\"}",
       "x-ms-ratelimit-remaining-subscription-writes" : "1192",
       "transfer-encoding" : "chunked",
       "x-ms-routing-request-id" : "WESTUS2:20170124T231416Z:5ffc503c-582c-4cbb-94ad-585f2ed27ac6",
@@ -396,7 +396,7 @@
     "Response" : {
       "StatusCode" : "200",
       "content-type" : "application/json",
-      "Body" : "{\"keys\":[{\"keyName\":\"key1\",\"permissions\":\"Full\",\"value\":\"i1TivzPjenluMjE7B5Grrk2GxoM4XIjZ26Ubv/B+sKIOIFhh31wpqrzmNq0M010SOCGiljl2Hy/0O1FKTNwzJA==\"},{\"keyName\":\"key2\",\"permissions\":\"Full\",\"value\":\"3JsH/DiYbkBGEBBgq5LZkP9IeeIfP7zQZBoLfv0c49Xmi4y6f0ofQlH1OWbHovSE9nUHxlMJDpFyQGloJUqImw==\"}]}\n",
+      "Body" : "{\"keys\":[{\"keyName\":\"key1\",\"keyName\":\"key1\",\"value\":\"MGMT_PLACEHOLDER\"},{\"keyName\":\"key2\",\"keyName\":\"key1\",\"value\":\"MGMT_PLACEHOLDER\"}]}\n",
       "x-ms-ratelimit-remaining-subscription-writes" : "1191",
       "transfer-encoding" : "chunked",
       "x-ms-routing-request-id" : "WESTUS2:20170124T231417Z:4da11d63-60f0-4a9d-ad9a-f260a1ab892d",
@@ -422,7 +422,7 @@
     "Response" : {
       "StatusCode" : "200",
       "content-type" : "application/json",
-      "Body" : "{\"keys\":[{\"keyName\":\"key1\",\"permissions\":\"Full\",\"value\":\"92Ov5Spa47x19zgJho6Vh49KMBXBxXvC1tHLCh7wwo91Ij04j7OxtDeuj68uvHHb4toemi9p6UaMj0rRhDkzEw==\"},{\"keyName\":\"key2\",\"permissions\":\"Full\",\"value\":\"3JsH/DiYbkBGEBBgq5LZkP9IeeIfP7zQZBoLfv0c49Xmi4y6f0ofQlH1OWbHovSE9nUHxlMJDpFyQGloJUqImw==\"}]}\n",
+      "Body" : "{\"keys\":[{\"keyName\":\"key1\",\"keyName\":\"key1\",\"value\":\"MGMT_PLACEHOLDER\"},{\"keyName\":\"key2\",\"keyName\":\"key1\",\"value\":\"MGMT_PLACEHOLDER\"}]}\n",
       "x-ms-ratelimit-remaining-subscription-writes" : "1190",
       "transfer-encoding" : "chunked",
       "x-ms-routing-request-id" : "WESTUS2:20170124T231418Z:8f96616c-f9dd-4073-af82-1a28dd037603",

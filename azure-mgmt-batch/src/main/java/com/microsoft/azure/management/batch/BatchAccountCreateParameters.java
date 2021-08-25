@@ -9,6 +9,7 @@
 package com.microsoft.azure.management.batch;
 
 import java.util.Map;
+import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microsoft.rest.serializer.JsonFlatten;
 
@@ -52,6 +53,37 @@ public class BatchAccountCreateParameters {
      */
     @JsonProperty(value = "properties.keyVaultReference")
     private KeyVaultReference keyVaultReference;
+
+    /**
+     * The network access type for accessing Azure Batch account.
+     * If not specified, the default value is 'enabled'. Possible values
+     * include: 'Enabled', 'Disabled'.
+     */
+    @JsonProperty(value = "properties.publicNetworkAccess")
+    private PublicNetworkAccessType publicNetworkAccess;
+
+    /**
+     * The encryption configuration for the Batch account.
+     * Configures how customer data is encrypted inside the Batch account. By
+     * default, accounts are encrypted using a Microsoft managed key. For
+     * additional control, a customer-managed key can be used instead.
+     */
+    @JsonProperty(value = "properties.encryption")
+    private EncryptionProperties encryption;
+
+    /**
+     * List of allowed authentication modes for the Batch account that can be
+     * used to authenticate with the data plane. This does not affect
+     * authentication with the control plane.
+     */
+    @JsonProperty(value = "properties.allowedAuthenticationModes")
+    private List<AuthenticationMode> allowedAuthenticationModes;
+
+    /**
+     * The identity of the Batch account.
+     */
+    @JsonProperty(value = "identity")
+    private BatchAccountIdentity identity;
 
     /**
      * Get the region in which to create the account.
@@ -150,6 +182,86 @@ public class BatchAccountCreateParameters {
      */
     public BatchAccountCreateParameters withKeyVaultReference(KeyVaultReference keyVaultReference) {
         this.keyVaultReference = keyVaultReference;
+        return this;
+    }
+
+    /**
+     * Get if not specified, the default value is 'enabled'. Possible values include: 'Enabled', 'Disabled'.
+     *
+     * @return the publicNetworkAccess value
+     */
+    public PublicNetworkAccessType publicNetworkAccess() {
+        return this.publicNetworkAccess;
+    }
+
+    /**
+     * Set if not specified, the default value is 'enabled'. Possible values include: 'Enabled', 'Disabled'.
+     *
+     * @param publicNetworkAccess the publicNetworkAccess value to set
+     * @return the BatchAccountCreateParameters object itself.
+     */
+    public BatchAccountCreateParameters withPublicNetworkAccess(PublicNetworkAccessType publicNetworkAccess) {
+        this.publicNetworkAccess = publicNetworkAccess;
+        return this;
+    }
+
+    /**
+     * Get configures how customer data is encrypted inside the Batch account. By default, accounts are encrypted using a Microsoft managed key. For additional control, a customer-managed key can be used instead.
+     *
+     * @return the encryption value
+     */
+    public EncryptionProperties encryption() {
+        return this.encryption;
+    }
+
+    /**
+     * Set configures how customer data is encrypted inside the Batch account. By default, accounts are encrypted using a Microsoft managed key. For additional control, a customer-managed key can be used instead.
+     *
+     * @param encryption the encryption value to set
+     * @return the BatchAccountCreateParameters object itself.
+     */
+    public BatchAccountCreateParameters withEncryption(EncryptionProperties encryption) {
+        this.encryption = encryption;
+        return this;
+    }
+
+    /**
+     * Get list of allowed authentication modes for the Batch account that can be used to authenticate with the data plane. This does not affect authentication with the control plane.
+     *
+     * @return the allowedAuthenticationModes value
+     */
+    public List<AuthenticationMode> allowedAuthenticationModes() {
+        return this.allowedAuthenticationModes;
+    }
+
+    /**
+     * Set list of allowed authentication modes for the Batch account that can be used to authenticate with the data plane. This does not affect authentication with the control plane.
+     *
+     * @param allowedAuthenticationModes the allowedAuthenticationModes value to set
+     * @return the BatchAccountCreateParameters object itself.
+     */
+    public BatchAccountCreateParameters withAllowedAuthenticationModes(List<AuthenticationMode> allowedAuthenticationModes) {
+        this.allowedAuthenticationModes = allowedAuthenticationModes;
+        return this;
+    }
+
+    /**
+     * Get the identity of the Batch account.
+     *
+     * @return the identity value
+     */
+    public BatchAccountIdentity identity() {
+        return this.identity;
+    }
+
+    /**
+     * Set the identity of the Batch account.
+     *
+     * @param identity the identity value to set
+     * @return the BatchAccountCreateParameters object itself.
+     */
+    public BatchAccountCreateParameters withIdentity(BatchAccountIdentity identity) {
+        this.identity = identity;
         return this;
     }
 

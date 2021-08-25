@@ -4,16 +4,16 @@
     <parent>
         <groupId>com.microsoft.azure</groupId>
         <artifactId>azure-parent</artifactId>
-        <version>1.35.2</version>
+        <version>1.41.2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>azure-mgmt-monitor</artifactId>
-  <version>1.35.2</version>
+  <version>1.41.2</version>
     <packaging>jar</packaging>
 
     <name>Microsoft Azure SDK for Monitor Management</name>
-    <description>This package contains Microsoft Azure Monitor SDK.</description>
+    <description>This package contains Microsoft Azure Monitor SDK. This package is in low maintenance mode and being phased out. To use the latest Azure SDK for resource management, please see https://aka.ms/azsdk/java/mgmt</description>
     <url>https://github.com/Azure/azure-sdk-for-java</url>
 
     <licenses>
@@ -27,7 +27,7 @@
     <scm>
         <url>scm:git:https://github.com/Azure/azure-sdk-for-java</url>
         <connection>scm:git:git@github.com:Azure/azure-sdk-for-java.git</connection>
-        <tag>v1.35.1</tag>
+        <tag>v1.41.2</tag>
     </scm>
 
     <properties>
@@ -50,7 +50,7 @@
         <dependency>
             <groupId>com.microsoft.azure</groupId>
             <artifactId>azure-mgmt-resources</artifactId>
-            <version>1.35.2</version>
+            <version>1.41.2</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -65,13 +65,13 @@
         <dependency>
             <groupId>com.microsoft.azure</groupId>
             <artifactId>azure-mgmt-compute</artifactId>
-            <version>1.35.2</version>
+            <version>1.41.2</version>
             <scope>test</scope>     
         </dependency>
         <dependency>
             <groupId>com.microsoft.azure</groupId>
             <artifactId>azure-mgmt-appservice</artifactId>
-            <version>1.35.2</version>
+            <version>1.41.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -82,7 +82,7 @@
         <dependency>
             <groupId>com.microsoft.azure</groupId>
             <artifactId>azure-mgmt-eventhub</artifactId>
-            <version>1.35.2</version>
+            <version>1.41.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -103,7 +103,7 @@
                 <dependency>
                     <groupId>com.microsoft.azure</groupId>
                     <artifactId>azure-mgmt-resources</artifactId>
-                    <version>1.35.2</version>
+                    <version>1.41.2</version>
                     <type>test-jar</type>
                     <scope>test</scope>
                 </dependency>

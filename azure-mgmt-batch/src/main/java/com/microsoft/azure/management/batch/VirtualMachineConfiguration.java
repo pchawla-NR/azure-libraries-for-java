@@ -79,6 +79,37 @@ public class VirtualMachineConfiguration {
     private ContainerConfiguration containerConfiguration;
 
     /**
+     * The disk encryption configuration for the pool.
+     * If specified, encryption is performed on each node in the pool during
+     * node provisioning.
+     */
+    @JsonProperty(value = "diskEncryptionConfiguration")
+    private DiskEncryptionConfiguration diskEncryptionConfiguration;
+
+    /**
+     * The node placement configuration for the pool.
+     * This configuration will specify rules on how nodes in the pool will be
+     * physically allocated.
+     */
+    @JsonProperty(value = "nodePlacementConfiguration")
+    private NodePlacementConfiguration nodePlacementConfiguration;
+
+    /**
+     * The virtual machine extension for the pool.
+     * If specified, the extensions mentioned in this configuration will be
+     * installed on each node.
+     */
+    @JsonProperty(value = "extensions")
+    private List<VMExtension> extensions;
+
+    /**
+     * Settings for the operating system disk of the Virtual Machine.
+     * Contains configuration for ephemeral OSDisk settings.
+     */
+    @JsonProperty(value = "osDisk")
+    private OSDisk osDisk;
+
+    /**
      * Get the imageReference value.
      *
      * @return the imageReference value
@@ -199,6 +230,86 @@ public class VirtualMachineConfiguration {
      */
     public VirtualMachineConfiguration withContainerConfiguration(ContainerConfiguration containerConfiguration) {
         this.containerConfiguration = containerConfiguration;
+        return this;
+    }
+
+    /**
+     * Get if specified, encryption is performed on each node in the pool during node provisioning.
+     *
+     * @return the diskEncryptionConfiguration value
+     */
+    public DiskEncryptionConfiguration diskEncryptionConfiguration() {
+        return this.diskEncryptionConfiguration;
+    }
+
+    /**
+     * Set if specified, encryption is performed on each node in the pool during node provisioning.
+     *
+     * @param diskEncryptionConfiguration the diskEncryptionConfiguration value to set
+     * @return the VirtualMachineConfiguration object itself.
+     */
+    public VirtualMachineConfiguration withDiskEncryptionConfiguration(DiskEncryptionConfiguration diskEncryptionConfiguration) {
+        this.diskEncryptionConfiguration = diskEncryptionConfiguration;
+        return this;
+    }
+
+    /**
+     * Get this configuration will specify rules on how nodes in the pool will be physically allocated.
+     *
+     * @return the nodePlacementConfiguration value
+     */
+    public NodePlacementConfiguration nodePlacementConfiguration() {
+        return this.nodePlacementConfiguration;
+    }
+
+    /**
+     * Set this configuration will specify rules on how nodes in the pool will be physically allocated.
+     *
+     * @param nodePlacementConfiguration the nodePlacementConfiguration value to set
+     * @return the VirtualMachineConfiguration object itself.
+     */
+    public VirtualMachineConfiguration withNodePlacementConfiguration(NodePlacementConfiguration nodePlacementConfiguration) {
+        this.nodePlacementConfiguration = nodePlacementConfiguration;
+        return this;
+    }
+
+    /**
+     * Get if specified, the extensions mentioned in this configuration will be installed on each node.
+     *
+     * @return the extensions value
+     */
+    public List<VMExtension> extensions() {
+        return this.extensions;
+    }
+
+    /**
+     * Set if specified, the extensions mentioned in this configuration will be installed on each node.
+     *
+     * @param extensions the extensions value to set
+     * @return the VirtualMachineConfiguration object itself.
+     */
+    public VirtualMachineConfiguration withExtensions(List<VMExtension> extensions) {
+        this.extensions = extensions;
+        return this;
+    }
+
+    /**
+     * Get contains configuration for ephemeral OSDisk settings.
+     *
+     * @return the osDisk value
+     */
+    public OSDisk osDisk() {
+        return this.osDisk;
+    }
+
+    /**
+     * Set contains configuration for ephemeral OSDisk settings.
+     *
+     * @param osDisk the osDisk value to set
+     * @return the VirtualMachineConfiguration object itself.
+     */
+    public VirtualMachineConfiguration withOsDisk(OSDisk osDisk) {
+        this.osDisk = osDisk;
         return this;
     }
 

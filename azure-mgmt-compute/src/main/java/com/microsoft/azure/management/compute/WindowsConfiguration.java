@@ -52,6 +52,13 @@ public class WindowsConfiguration {
     private List<AdditionalUnattendContent> additionalUnattendContent;
 
     /**
+     * [Preview Feature] Specifies settings related to VM Guest Patching on
+     * Windows.
+     */
+    @JsonProperty(value = "patchSettings")
+    private PatchSettings patchSettings;
+
+    /**
      * Specifies the Windows Remote Management listeners. This enables remote
      * Windows PowerShell.
      */
@@ -135,6 +142,26 @@ public class WindowsConfiguration {
      */
     public WindowsConfiguration withAdditionalUnattendContent(List<AdditionalUnattendContent> additionalUnattendContent) {
         this.additionalUnattendContent = additionalUnattendContent;
+        return this;
+    }
+
+    /**
+     * Get [Preview Feature] Specifies settings related to VM Guest Patching on Windows.
+     *
+     * @return the patchSettings value
+     */
+    public PatchSettings patchSettings() {
+        return this.patchSettings;
+    }
+
+    /**
+     * Set [Preview Feature] Specifies settings related to VM Guest Patching on Windows.
+     *
+     * @param patchSettings the patchSettings value to set
+     * @return the WindowsConfiguration object itself.
+     */
+    public WindowsConfiguration withPatchSettings(PatchSettings patchSettings) {
+        this.patchSettings = patchSettings;
         return this;
     }
 

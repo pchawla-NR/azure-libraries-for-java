@@ -18,10 +18,17 @@ import com.microsoft.rest.serializer.JsonFlatten;
 @JsonFlatten
 public class DiskEncryptionSetUpdate {
     /**
+     * Possible values include: 'EncryptionAtRestWithCustomerKey',
+     * 'EncryptionAtRestWithPlatformAndCustomerKeys'.
+     */
+    @JsonProperty(value = "properties.encryptionType")
+    private DiskEncryptionSetType encryptionType;
+
+    /**
      * The activeKey property.
      */
     @JsonProperty(value = "properties.activeKey")
-    private KeyVaultAndKeyReference activeKey;
+    private KeyForDiskEncryptionSet activeKey;
 
     /**
      * Resource tags.
@@ -30,11 +37,31 @@ public class DiskEncryptionSetUpdate {
     private Map<String, String> tags;
 
     /**
+     * Get possible values include: 'EncryptionAtRestWithCustomerKey', 'EncryptionAtRestWithPlatformAndCustomerKeys'.
+     *
+     * @return the encryptionType value
+     */
+    public DiskEncryptionSetType encryptionType() {
+        return this.encryptionType;
+    }
+
+    /**
+     * Set possible values include: 'EncryptionAtRestWithCustomerKey', 'EncryptionAtRestWithPlatformAndCustomerKeys'.
+     *
+     * @param encryptionType the encryptionType value to set
+     * @return the DiskEncryptionSetUpdate object itself.
+     */
+    public DiskEncryptionSetUpdate withEncryptionType(DiskEncryptionSetType encryptionType) {
+        this.encryptionType = encryptionType;
+        return this;
+    }
+
+    /**
      * Get the activeKey value.
      *
      * @return the activeKey value
      */
-    public KeyVaultAndKeyReference activeKey() {
+    public KeyForDiskEncryptionSet activeKey() {
         return this.activeKey;
     }
 
@@ -44,7 +71,7 @@ public class DiskEncryptionSetUpdate {
      * @param activeKey the activeKey value to set
      * @return the DiskEncryptionSetUpdate object itself.
      */
-    public DiskEncryptionSetUpdate withActiveKey(KeyVaultAndKeyReference activeKey) {
+    public DiskEncryptionSetUpdate withActiveKey(KeyForDiskEncryptionSet activeKey) {
         this.activeKey = activeKey;
         return this;
     }

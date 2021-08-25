@@ -103,6 +103,7 @@ import com.microsoft.azure.management.resources.Providers;
 import com.microsoft.azure.management.resources.ResourceGroups;
 import com.microsoft.azure.management.resources.Subscription;
 import com.microsoft.azure.management.resources.Subscriptions;
+import com.microsoft.azure.management.resources.TagOperations;
 import com.microsoft.azure.management.resources.Tenants;
 import com.microsoft.azure.management.resources.fluentcore.arm.AzureConfigurable;
 import com.microsoft.azure.management.resources.fluentcore.arm.implementation.AzureConfigurableImpl;
@@ -132,6 +133,8 @@ import java.io.IOException;
 
 /**
  * The entry point for accessing resource management APIs in Azure.
+ *
+ * A new set of management libraries are now Generally Available. For documentation on how to use the new libraries, please @see <a href="https://aka.ms/azsdk/java/mgmt">the new libraries for Azure resource management</a>.
  */
 public final class Azure implements AzureInterface {
     private final ResourceManager resourceManager;
@@ -1090,5 +1093,10 @@ public final class Azure implements AzureInterface {
      */
     public ManagementPolicies storageManagementPolicies() {
         return this.storageManager.managementPolicies();
+    }
+
+    /** @return entry point to tag management management */
+    public TagOperations tagOperations() {
+        return this.resourceManager.tagOperations();
     }
 }
