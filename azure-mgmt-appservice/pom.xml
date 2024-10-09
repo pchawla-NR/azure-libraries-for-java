@@ -8,7 +8,7 @@
   <parent>
     <groupId>com.microsoft.azure</groupId>
     <artifactId>azure-parent</artifactId>
-    <version>1.41.2</version>
+    <version>1.41.3</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -53,27 +53,27 @@
     <dependency>
       <groupId>com.microsoft.azure</groupId>
       <artifactId>azure-mgmt-resources</artifactId>
-      <version>1.41.2</version>
+      <version>1.41.3</version>
     </dependency>
     <dependency>
       <groupId>com.microsoft.azure</groupId>
       <artifactId>azure-mgmt-storage</artifactId>
-      <version>1.41.2</version>
+      <version>1.41.3</version>
     </dependency>
     <dependency>
       <groupId>com.microsoft.azure</groupId>
       <artifactId>azure-mgmt-msi</artifactId>
-      <version>1.41.2</version>
+      <version>1.41.3</version>
     </dependency>
     <dependency>
       <groupId>com.microsoft.azure</groupId>
       <artifactId>azure-mgmt-keyvault</artifactId>
-      <version>1.41.2</version>
+      <version>1.41.3</version>
     </dependency>
     <dependency>
       <groupId>com.microsoft.azure</groupId>
       <artifactId>azure-mgmt-dns</artifactId>
-      <version>1.41.2</version>
+      <version>1.41.3</version>
     </dependency>
     <dependency>
       <groupId>com.microsoft.azure</groupId>
@@ -124,7 +124,7 @@
         <dependency>
           <groupId>com.microsoft.azure</groupId>
           <artifactId>azure-mgmt-resources</artifactId>
-          <version>1.41.2</version>
+          <version>1.41.3</version>
           <type>test-jar</type>
           <scope>test</scope>
         </dependency>
@@ -150,8 +150,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.1</version>
         <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
+          <source>1.8</source>
+          <target>1.8</target>
           <annotationProcessors>
             <annotationProcessor>
               com.microsoft.azure.management.apigeneration.LangDefinitionProcessor</annotationProcessor>
