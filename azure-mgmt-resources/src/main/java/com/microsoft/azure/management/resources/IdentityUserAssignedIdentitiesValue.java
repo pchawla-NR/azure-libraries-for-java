@@ -9,10 +9,12 @@
 package com.microsoft.azure.management.resources;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * The IdentityUserAssignedIdentitiesValue model.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class IdentityUserAssignedIdentitiesValue {
     /**
      * The principal id of user assigned identity.
@@ -26,6 +28,11 @@ public class IdentityUserAssignedIdentitiesValue {
     @JsonProperty(value = "clientId", access = JsonProperty.Access.WRITE_ONLY)
     private String clientId;
 
+    /**
+     * The tenant id of user assigned identity.
+     */
+    @JsonProperty(value = "tenantId", access = JsonProperty.Access.WRITE_ONLY)
+    private String tenantId;
     /**
      * Get the principal id of user assigned identity.
      *
@@ -44,4 +51,12 @@ public class IdentityUserAssignedIdentitiesValue {
         return this.clientId;
     }
 
+    /**
+     * Get the client id of user assigned identity.
+     *
+     * @return the clientId value
+     */
+    public String tenantId() {
+        return this.tenantId;
+    }
 }
